@@ -1,5 +1,5 @@
 import { Heart, Target, Sprout, Users } from 'lucide-react'
-import { NavigationItem, PageNavigationItem, Goal, Phase, Zone, Risk } from './types'
+import { NavigationItem, PageNavigationItem, Goal, Phase, Zone, Risk, NextStep } from './types'
 
 // Site Configuration
 export const SITE_CONFIG = {
@@ -11,19 +11,16 @@ export const SITE_CONFIG = {
 
 // Navigation Data
 export const HOME_NAV_ITEMS: NavigationItem[] = [
-  { id: 'home', label: 'Home' },
-  { id: 'summary', label: 'Why This Matters' },
-  { id: 'context', label: 'Our Story' },
-  { id: 'lease-models', label: 'Choose Your Path' },
-  { id: 'calculator', label: 'Your Journey' },
+  { id: 'summary', label: 'Why Farm' },
+  { id: 'lease-models', label: 'Your Path' },
+  { id: 'calculator', label: 'Calculator' },
   { id: 'action-plan', label: 'Get Started' },
-  { id: 'risks', label: 'Grow Stronger' },
   { id: 'contact', label: 'Community' },
 ]
 
 export const PAGE_NAV_ITEMS: PageNavigationItem[] = [
-  { href: '/', label: 'Home' },
-  { href: '/my-path', label: 'My Path' },
+  { href: '/my-path', label: 'My Journey' },
+  { href: '/farmer-perspective', label: 'For Landowners' },
 ]
 
 // Goals Data for My Path Page
@@ -147,13 +144,37 @@ export const RISKS: Risk[] = [
 ]
 
 // Next Steps Data for My Path Page
-export const NEXT_STEPS = [
-  'List your non-negotiables (within 90-min drive of family, spring water, ≥ 5 ropani flat terrace)',
-  'Engage a local agronomist/realtor to scout three candidate plots; schedule November visit',
-  'Draft lease template now (English + Nepali) so you negotiate from strength',
-  'Line up remote-work retainer with current U.S. employer—it will be your runway',
-  'Book PDC with Nepal Permaculture Group for next spring intake; networking gold',
-  'Start digital presence (Instagram + landing page) today; share the "journey" to build audience'
+export const NEXT_STEPS: NextStep[] = [
+  {
+    action: 'Define Your Non-Negotiables',
+    description: 'List your requirements: 90-min drive from family, spring water, ≥ 5 ropani flat terrace',
+    timeline: 'Week 1'
+  },
+  {
+    action: 'Scout Potential Plots',
+    description: 'Engage local agronomist/realtor to find three candidate plots and schedule site visits',
+    timeline: 'Month 1'
+  },
+  {
+    action: 'Prepare Legal Framework',
+    description: 'Draft lease template in English + Nepali to negotiate from strength',
+    timeline: 'Month 1'
+  },
+  {
+    action: 'Secure Financial Runway',
+    description: 'Line up remote-work retainer with current U.S. employer for stability',
+    timeline: 'Month 1'
+  },
+  {
+    action: 'Get Certified Training',
+    description: 'Book PDC with Nepal Permaculture Group for networking and skills',
+    timeline: 'Month 2'
+  },
+  {
+    action: 'Build Your Brand',
+    description: 'Start digital presence with Instagram + landing page to document your journey',
+    timeline: 'Ongoing'
+  }
 ]
 
 // Financial Calculator Constants

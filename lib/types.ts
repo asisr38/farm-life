@@ -48,6 +48,13 @@ export interface Risk {
   severity: 'low' | 'medium' | 'high'
 }
 
+// Next Step Types
+export interface NextStep {
+  action: string
+  description: string
+  timeline: string
+}
+
 // Form Types
 export interface CalculatorData {
   landSize: number

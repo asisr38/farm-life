@@ -2,266 +2,284 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
-import { GOALS, PHASES, ZONES, RISKS, NEXT_STEPS, ANIMATION_DURATION, ANIMATION_DELAYS } from '@/lib/constants'
+import { CheckCircle, Circle, AlertTriangle, ArrowRight, Calendar, Target, MapPin, Zap } from 'lucide-react'
+import { GOALS, PHASES, ZONES, RISKS, NEXT_STEPS } from '@/lib/constants'
 import { getRiskSeverityColor } from '@/lib/utils'
 
 export default function MyPath() {
   const [activePhase, setActivePhase] = useState(0)
+  const [completedPhases, setCompletedPhases] = useState<number[]>([])
+
+  const togglePhaseCompletion = (phaseIndex: number) => {
+    setCompletedPhases(prev => 
+      prev.includes(phaseIndex) 
+        ? prev.filter(i => i !== phaseIndex)
+        : [...prev, phaseIndex]
+    )
+  }
+
+  const timelineSteps = [
+    {
+      id: 1,
+      title: "Clarify Your Why",
+      subtitle: "Set measurable goals",
+      duration: "Week 1-2",
+      icon: Target,
+      color: "from-purple-500 to-purple-600",
+      description: "Define your vision with concrete, measurable targets"
+    },
+    {
+      id: 2,
+      title: "Legal Foundation",
+      subtitle: "Paperwork & permissions",
+      duration: "Month 1-2",
+      icon: CheckCircle,
+      color: "from-blue-500 to-blue-600",
+      description: "Get your legal ducks in a row while still in the U.S."
+    },
+    {
+      id: 3,
+      title: "Find Your Land",
+      subtitle: "Secure the perfect plot",
+      duration: "Month 1-6",
+      icon: MapPin,
+      color: "from-green-500 to-green-600",
+      description: "Locate and secure 15-25km from Ring Road"
+    },
+    {
+      id: 4,
+      title: "Design Your System",
+      subtitle: "Plan the farm layout",
+      duration: "Month 4-9",
+      icon: Circle,
+      color: "from-yellow-500 to-yellow-600",
+      description: "Zone your 5 ropani for maximum efficiency"
+    },
+    {
+      id: 5,
+      title: "Phase Implementation",
+      subtitle: "Build step by step",
+      duration: "Month 1-36",
+      icon: Zap,
+      color: "from-red-500 to-red-600",
+      description: "Execute your 4-phase development plan"
+    },
+    {
+      id: 6,
+      title: "Community Building",
+      subtitle: "Connect & grow together",
+      duration: "Ongoing",
+      icon: CheckCircle,
+      color: "from-indigo-500 to-indigo-600",
+      description: "Build networks and teaching opportunities"
+    }
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-farm pt-16">
-      {/* Hero Section */}
-      <section className="section-padding">
-        <div className="container-custom">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50">
+      {/* Hero Section with Timeline Preview */}
+      <section className="pt-24 pb-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50"></div>
+        <div className="container-custom relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium mb-6">
+              <Calendar className="w-4 h-4 mr-2" />
+              3-Year Transformation Journey
+            </div>
             <h1 className="text-5xl sm:text-6xl font-bold mb-6">
-              <span className="text-gradient-primary">My Path</span>
+              <span className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Your Path to Freedom
+              </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              A three-year transition roadmap from U.S. software developer to sustainable homestead 
-              in Kathmandu Valley—creating a place that feeds you, pays its own way, and serves as 
-              a learning community for visitors.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Goals Section */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              1. Clarify Your "Why" in Numbers
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These targets help you decide how much land, labour and capital you actually need—so the plan stays grounded.
+              From U.S. software developer to sustainable homestead owner in Kathmandu Valley—
+              a step-by-step roadmap that transforms dreams into reality.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {GOALS.map((goal, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: ANIMATION_DURATION.slow, delay: index * ANIMATION_DELAYS.stagger }}
-                viewport={{ once: true }}
-                className="card text-center"
-              >
-                <div className={`flex justify-center mb-4 ${goal.color}`}>
-                  <goal.icon className="h-10 w-10" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {goal.title}
-                </h3>
-                <p className="text-sm font-medium text-gray-800 mb-1">
-                  {goal.target}
-                </p>
-                <p className="text-xs text-gray-600">
-                  {goal.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Legal & Ownership */}
-      <section className="section-padding bg-gray-50">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              2. Legal & Ownership Box-checking
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Do this while still in the U.S. to set yourself up for success.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="card"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">NRN Citizenship</h3>
-              <p className="text-gray-600 mb-4">
-                Obtain—or renew—NRN citizenship: lets you live in Nepal indefinitely and buy land, 
-                but only up to 2 ropani (≈ 0.105 ha) inside the Valley; more if you go a little outside.
-              </p>
-              <div className="bg-farm-green-50 p-4 rounded-lg">
-                <p className="text-sm text-farm-green-700">
-                  💡 Consider Alpine Law Associates for legal guidance
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="card"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Entity Structure</h3>
-              <div className="space-y-4">
-                <div className="p-4 bg-valley-blue-50 rounded-lg">
-                  <h4 className="font-medium text-valley-blue-800 mb-2">Private Limited Company</h4>
-                  <p className="text-sm text-valley-blue-700">
-                    For agritourism + produce sales, lets you lease unlimited land and gives VAT registration
-                  </p>
-                </div>
-                <div className="p-4 bg-earth-brown-50 rounded-lg">
-                  <h4 className="font-medium text-earth-brown-800 mb-2">Personal NRN Title</h4>
-                  <p className="text-sm text-earth-brown-700">
-                    Keep a small "homestead" plot (≤ 2 ropani) for the farmhouse itself
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Find & Secure Plot */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              3. Find & Secure the Right Plot
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Months 0-6: Focus on areas 15-25 km from Ring Road for clean air yet market access.
-            </p>
-          </motion.div>
-
-          <div className="bg-gradient-to-r from-farm-green-50 to-valley-blue-50 rounded-2xl p-8 mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Radius</h4>
-                <p className="text-sm text-gray-600">
-                  Budhanilkantha, Lele, Dhaksi, Bhangal, Namobuddha
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Lease Cost</h4>
-                <p className="text-sm text-gray-600">
-                  NPR 1-3 lakh/ropani/yr. Budget 1.5 lakh/ropani on high side
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Water</h4>
-                <p className="text-sm text-gray-600">
-                  Prioritise gravity-fed springs or canals
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Tenure</h4>
-                <p className="text-sm text-gray-600">
-                  5+5-year lease-with-option-to-buy
-                </p>
-              </div>
+          {/* Timeline Overview */}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16">
+              {timelineSteps.map((step, index) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="text-center group cursor-pointer"
+                  onClick={() => setActivePhase(index)}
+                >
+                  <div className={`w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r ${step.color} 
+                    flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300
+                    ${activePhase === index ? 'ring-4 ring-green-200 scale-110' : ''}`}>
+                    <step.icon className="w-7 h-7" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{step.title}</h3>
+                  <p className="text-xs text-gray-500">{step.duration}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Farm System Design */}
-      <section className="section-padding bg-gray-50">
+      {/* Main Timeline Section */}
+      <section className="py-16 bg-white">
         <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              4. Design the Farm System
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Months 4-9: Zoning your first 5 ropani for maximum efficiency and sustainability.
-            </p>
-          </motion.div>
+          <div className="max-w-4xl mx-auto">
+            {/* Goals Section - Step 1 */}
+            <div className="relative">
+              {/* Timeline Line */}
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-200 via-blue-200 via-green-200 via-yellow-200 via-red-200 to-indigo-200"></div>
+              
+              {timelineSteps.map((step, stepIndex) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: stepIndex * 0.2 }}
+                  viewport={{ once: true }}
+                  className="relative mb-16 last:mb-0"
+                >
+                  {/* Timeline Node */}
+                  <div className={`absolute left-6 w-4 h-4 rounded-full bg-gradient-to-r ${step.color} 
+                    border-4 border-white shadow-lg z-10`}></div>
+                  
+                  {/* Content Card */}
+                  <div className="ml-20">
+                    <motion.div
+                      className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 p-8
+                        ${activePhase === stepIndex ? 'border-green-200 shadow-xl scale-[1.02]' : 'border-gray-100 hover:border-gray-200 hover:shadow-xl'}`}
+                      onHoverStart={() => setActivePhase(stepIndex)}
+                    >
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-6">
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full mr-3">
+                              {step.duration}
+                            </span>
+                            <span className="text-sm text-gray-500">Step {step.id}</span>
+                          </div>
+                          <h2 className="text-2xl font-bold text-gray-900 mb-2">{step.title}</h2>
+                          <p className="text-gray-600">{step.description}</p>
+                        </div>
+                        <motion.button
+                          onClick={() => togglePhaseCompletion(stepIndex)}
+                          className={`p-2 rounded-full transition-colors duration-200 ${
+                            completedPhases.includes(stepIndex) 
+                              ? 'bg-green-100 text-green-600' 
+                              : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          }`}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                        </motion.button>
+                      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {ZONES.map((zone, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className={`p-6 rounded-2xl border-2 border-white ${zone.color}`}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Zone {String.fromCharCode(65 + index)} – {zone.name}
-                  </h3>
-                  <span className="text-sm font-medium text-gray-600 bg-white px-2 py-1 rounded">
-                    {zone.size}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-700">{zone.functions}</p>
-              </motion.div>
-            ))}
-          </div>
+                      {/* Step-specific Content */}
+                      {stepIndex === 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {GOALS.map((goal, goalIndex) => (
+                            <motion.div
+                              key={goalIndex}
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.6, delay: goalIndex * 0.1 }}
+                              viewport={{ once: true }}
+                              className={`p-4 rounded-xl border-2 ${goal.color}`}
+                            >
+                              <div className="flex items-center mb-3">
+                                <goal.icon className="w-5 h-5 mr-2 text-gray-700" />
+                                <h3 className="font-semibold text-gray-900">{goal.title}</h3>
+                              </div>
+                              <p className="text-lg font-bold text-green-600 mb-1">{goal.target}</p>
+                              <p className="text-sm text-gray-600">{goal.description}</p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
 
-          {/* Energy & Tech */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="card"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Energy & Technology</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium text-gray-800 mb-2">Solar Power System</h4>
-                <p className="text-sm text-gray-600">
-                  10 kW rooftop solar + 5 kWh Li-ion: covers house, pump, cold-room and compact EV-three-wheeler
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-800 mb-2">Farm Management Tech</h4>
-                <p className="text-sm text-gray-600">
-                  FieldKit or custom React dashboard for volunteers to record inputs & yields—great teaching tool
-                </p>
-              </div>
+                      {stepIndex === 4 && (
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {PHASES.map((phase, phaseIndex) => (
+                              <motion.div
+                                key={phaseIndex}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.6, delay: phaseIndex * 0.1 }}
+                                viewport={{ once: true }}
+                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
+                                  ${activePhase === phaseIndex ? 'border-green-300 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
+                              >
+                                <div className={`w-8 h-8 rounded-lg ${phase.color} text-white flex items-center justify-center mb-3 text-sm font-bold`}>
+                                  {phaseIndex + 1}
+                                </div>
+                                <h4 className="font-semibold text-gray-900 mb-2">{phase.title}</h4>
+                                <p className="text-xs text-gray-600 mb-2">Months {phase.months}</p>
+                                <p className="text-sm font-bold text-green-600">{phase.budget}</p>
+                                <p className="text-xs text-gray-500 mt-1">{phase.output}</p>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {stepIndex === 3 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {ZONES.map((zone, zoneIndex) => (
+                            <motion.div
+                              key={zoneIndex}
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.6, delay: zoneIndex * 0.1 }}
+                              viewport={{ once: true }}
+                              className={`p-4 rounded-xl border-2 ${zone.color}`}
+                            >
+                              <div className="flex justify-between items-start mb-3">
+                                <h4 className="font-semibold text-gray-900">
+                                  Zone {String.fromCharCode(65 + zoneIndex)} – {zone.name}
+                                </h4>
+                                <span className="text-xs font-medium text-gray-600 bg-white px-2 py-1 rounded">
+                                  {zone.size}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-700">{zone.functions}</p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Action Button */}
+                      <motion.div 
+                        className="mt-6 flex justify-end"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                      >
+                        <button className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium">
+                          Learn More
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </button>
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Phase-in Timeline */}
-      <section className="section-padding bg-white">
+      {/* Risk Assessment with Timeline Context */}
+      <section className="py-16 bg-gray-50">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -271,179 +289,37 @@ export default function MyPath() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              5. Phase-in Timeline & Budget
+              Challenges Along the Path
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              A structured approach to building your sustainable homestead over 36 months.
+              Every journey has obstacles. Here's how to navigate them and grow stronger.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {PHASES.map((phase, index) => (
+          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+            {RISKS.map((risk, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className={`card cursor-pointer transition-all duration-300 ${
-                  activePhase === index ? 'ring-2 ring-farm-green-500 scale-105' : ''
-                }`}
-                onClick={() => setActivePhase(index)}
-              >
-                <div className={`w-12 h-12 rounded-xl ${phase.color} text-white flex items-center justify-center mb-4 text-lg font-bold`}>
-                  {index + 1}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{phase.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">Months {phase.months}</p>
-                <p className="text-lg font-bold text-farm-green-600">{phase.budget}</p>
-                <p className="text-xs text-gray-500 mt-2">{phase.output}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Running Costs */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-farm-green-50 to-valley-blue-50 rounded-2xl p-8"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Running Cost (Mature)</h4>
-                <p className="text-2xl font-bold text-farm-green-600">9-10 Lakh/yr</p>
-                <p className="text-sm text-gray-600">Labour, feed grain, packaging</p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Projected Revenue (Yr 3)</h4>
-                <p className="text-2xl font-bold text-valley-blue-600">16-18 Lakh</p>
-                <p className="text-sm text-gray-600">Veg CSA + farm-stay + classes</p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Net Profit</h4>
-                <p className="text-2xl font-bold text-earth-brown-600">6 Lakh (35%)</p>
-                <p className="text-sm text-gray-600">Sustainable margin</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Community & Teaching */}
-      <section className="section-padding bg-gray-50">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              6. Community & Teaching Components
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Building multiple revenue streams while creating positive impact.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">WWOOF Host Farm</h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  Register; 2 volunteers max at a time (food + bed for 5 hrs work)
-                </p>
-                <p className="text-xs text-farm-green-600 font-medium">
-                  Impact: Free labour, global exposure
-                </p>
-              </div>
-
-              <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Weekend Workshops</h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  Monthly "Intro to Permaculture" / "Nepali Goat Cheese" (₨ 2,000 fee)
-                </p>
-                <p className="text-xs text-valley-blue-600 font-medium">
-                  Income: 15 pax brings ₨ 30,000 gross; builds mailing list
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">School Eco-camps</h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  Partner with int'l schools in Lalitpur/Kathmandu for 1-day field trips
-                </p>
-                <p className="text-xs text-earth-brown-600 font-medium">
-                  Income: Flat ₨ 400/student incl. lunch
-                </p>
-              </div>
-
-              <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Digital Storytelling</h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  Use software skills for React/Next site with booking, live soil-sensor dashboard, blog
-                </p>
-                <p className="text-xs text-farm-green-600 font-medium">
-                  Impact: Enhances brand; remote revenue via Patreon/courses
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* De-risking */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              7. De-risking the Leap
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Identifying potential challenges and practical solutions.
-            </p>
-          </motion.div>
-
-          <div className="space-y-4">
-            {RISKS.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="card"
+                className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="flex items-start space-x-4">
-                  <div className={`p-2 rounded-lg ${getRiskSeverityColor(item.severity)}`}>
-                    <AlertTriangle className="h-5 w-5" />
+                  <div className={`p-2 rounded-lg ${getRiskSeverityColor(risk.severity)} bg-opacity-10`}>
+                    <AlertTriangle className={`w-5 h-5 ${getRiskSeverityColor(risk.severity)}`} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">{item.risk}</h3>
-                    <p className="text-sm text-gray-600">{item.mitigation}</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">{risk.risk}</h3>
+                    <p className="text-sm text-gray-600 mb-3">{risk.mitigation}</p>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      risk.severity === 'low' ? 'bg-green-100 text-green-800' :
+                      risk.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {risk.severity.charAt(0).toUpperCase() + risk.severity.slice(1)} Risk
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -452,8 +328,8 @@ export default function MyPath() {
         </div>
       </section>
 
-      {/* Next Steps */}
-      <section className="section-padding bg-gray-50">
+      {/* Next Steps - Action Timeline */}
+      <section className="py-16 bg-gradient-to-br from-green-600 to-blue-600 text-white">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -462,61 +338,44 @@ export default function MyPath() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              8. Concrete Next Steps
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Immediately actionable steps to begin your transformation.
+            <h2 className="text-4xl font-bold mb-6">Ready to Begin?</h2>
+            <p className="text-xl text-green-100 max-w-3xl mx-auto">
+              Your transformation starts with these immediate action steps.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {NEXT_STEPS.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="card"
-              >
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-farm-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-1">
-                    {index + 1}
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {NEXT_STEPS.map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300"
+                >
+                  <div className="text-2xl font-bold text-white mb-2">{index + 1}</div>
+                  <h3 className="font-semibold text-white mb-3">{step.action}</h3>
+                  <p className="text-green-100 text-sm mb-4">{step.description}</p>
+                  <div className="text-xs text-green-200 font-medium">
+                    Timeline: {step.timeline}
                   </div>
-                  <p className="text-sm text-gray-700">{step}</p>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Call to Action */}
-      <section className="section-padding bg-gradient-to-r from-farm-green-600 to-valley-blue-600 text-white">
-        <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
             viewport={{ once: true }}
-            className="text-center"
+            className="text-center mt-16"
           >
-            <h2 className="text-4xl font-bold mb-6">
-              Ready to Begin Your Journey?
-            </h2>
-            <p className="text-xl mb-8 max-w-3xl mx-auto opacity-90">
-              This roadmap transforms dreams into actionable steps. Your sustainable future 
-              in Kathmandu Valley starts with the first decision to move forward.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-farm-green-600 font-semibold py-3 px-8 rounded-2xl hover:bg-gray-50 transition-colors">
-                Start Planning Today
-              </button>
-              <button className="border-2 border-white text-white font-semibold py-3 px-8 rounded-2xl hover:bg-white/10 transition-colors">
-                Connect with Community
-              </button>
-            </div>
+            <button className="bg-white text-green-600 hover:bg-gray-50 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg">
+              Start Your Journey Today
+            </button>
           </motion.div>
         </div>
       </section>
