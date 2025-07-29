@@ -185,9 +185,10 @@ export default function FarmerPerspective() {
                 Your Land, Their Dreams
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed px-4">
-              Partner with passionate young farmers to transform your land into a thriving organic farm 
-              while securing better returns and preserving your legacy.
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
+              Partner with passionate farmers. Transform your land.
+              <br />
+              <span className="text-base text-gray-500">Better returns. Lasting legacy.</span>
             </p>
           </motion.div>
 

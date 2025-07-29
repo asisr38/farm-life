@@ -42,17 +42,17 @@ const ContextSection = () => {
   const opportunities = [
     {
       title: 'People Want Real Food',
-      description: 'More and more people are choosing organic, locally-grown food over imported produce',
+      description: 'Growing demand for organic, locally-grown food',
       icon: '🌱'
     },
     {
       title: 'Land is Available',
-      description: 'Many plots are sitting idle, waiting for someone who cares to bring them back to life',
+      description: 'Idle plots waiting for passionate farmers',
       icon: '🏔️'
     },
     {
       title: 'Community is Growing',
-      description: 'A movement of young people wanting to live sustainably and connect with the earth',
+      description: 'Young people choosing sustainable living',
       icon: '🤝'
     },
     {
@@ -75,10 +75,8 @@ const ContextSection = () => {
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
             The Story of Our Land
           </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Kathmandu Valley has been home to farmers for generations. Today, as the world changes, 
-            we have a chance to write a new chapter - one where young people return to the land 
-            with fresh eyes and open hearts.
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Generations of farmers. Fresh eyes. New chapter.
           </p>
         </motion.div>
 

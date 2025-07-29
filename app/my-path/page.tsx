@@ -96,9 +96,10 @@ export default function MyPath() {
                 Your Path to Freedom
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed px-4">
-              From U.S. software developer to sustainable homestead owner in Kathmandu Valley—
-              a step-by-step roadmap that transforms dreams into reality.
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
+              Software developer → Sustainable homesteader
+              <br />
+              <span className="text-base text-gray-500">Dreams into reality</span>
             </p>
           </motion.div>
 

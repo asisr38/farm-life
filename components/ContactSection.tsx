@@ -36,21 +36,21 @@ const ContactSection = () => {
     },
     {
       name: 'Kathmandu Valley Farmers\' Network (KVFN)',
-      description: 'Connect with other farmers, share tools and knowledge',
+      description: 'Connect with farmers 🤝 Share knowledge',
       icon: Users,
       link: '#',
       category: 'Community'
     },
     {
       name: 'Le Sherpa Market (Lazimpat)',
-      description: 'A place to sell your harvest and meet food lovers',
+      description: 'Sell harvest 🥕 Meet food lovers',
       icon: Leaf,
       link: '#',
       category: 'Market'
     },
     {
       name: 'Yellow House Market (Patan)',
-      description: 'Another wonderful market for organic produce',
+      description: 'Organic produce market 🌱',
       icon: Leaf,
       link: '#',
       category: 'Market'

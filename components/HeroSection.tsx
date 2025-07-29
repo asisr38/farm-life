@@ -62,7 +62,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-sm font-medium text-gray-700 mb-8"
           >
             <Sprout className="h-4 w-4 mr-2 text-farm-green-600" />
-            Sustainable Living • Community • Growth
+            🌱 Sustainable • 👥 Community • 📈 Growth
           </motion.div>
 
           {/* Main Heading */}
@@ -88,10 +88,11 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 text-gray-600 max-w-4xl mx-auto leading-relaxed font-light px-4"
+            className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 text-gray-600 max-w-3xl mx-auto leading-relaxed font-light px-4"
           >
-            Discover the joy of growing your own food, building community, and living sustainably 
-            in one of the most beautiful places on earth. Your journey to a meaningful life starts here.
+            Grow food. Build community. Live sustainably.
+            <br />
+            <span className="text-base sm:text-lg text-gray-500">Your meaningful life starts here.</span>
           </motion.p>
 
           {/* CTA Buttons */}
@@ -127,7 +128,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">42%</div>
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">Families still connected to the land</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Families ❤️ Land</div>
             </div>
             
             <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105">
@@ -137,7 +138,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">0.27 ha</div>
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">Average family plot - perfect to start</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Perfect Plot Size 🌱</div>
             </div>
             
             <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105 sm:col-span-2 md:col-span-1">
@@ -147,7 +148,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">20-50%</div>
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">More people choosing organic food</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Organic Food Demand 📈</div>
             </div>
           </motion.div>
         </div>

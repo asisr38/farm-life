@@ -14,10 +14,10 @@ const ActionPlan = () => {
       description: 'Find a piece of land that speaks to your soul',
       icon: Heart,
       details: [
-        'Visit different areas and feel the energy of each place',
-        'Look for land within 15-20 km of where you can sell your harvest',
-        'Check if the soil feels right under your feet',
-        'Make sure the land has a clear owner and good access'
+        'Visit areas, feel the energy',
+        'Find land within 15-20 km of markets',
+        'Check soil quality',
+        'Verify clear ownership & access'
       ],
       timeline: 'Week 1-2',
       color: 'bg-farm-green-500'
@@ -28,10 +28,10 @@ const ActionPlan = () => {
       description: 'Test the soil and water to understand what you\'re working with',
       icon: Sprout,
       details: [
-        'Test the soil to see what nutrients it has',
-        'Check if there\'s enough water for your dreams',
-        'See how the land drains when it rains',
-        'Understand what grows well in this climate'
+        'Test soil nutrients',
+        'Check water availability',
+        'Assess drainage',
+        'Research suitable crops'
       ],
       timeline: 'Week 3-4',
       color: 'bg-valley-blue-500'
@@ -42,10 +42,10 @@ const ActionPlan = () => {
       description: 'Create a fair arrangement that works for everyone',
       icon: FileText,
       details: [
-        'Write down your agreement with the landowner',
-        'Include a 5-year renewal option so you can plan ahead',
-        'Decide how you\'ll share the harvest or pay rent',
-        'Add a chance to buy the land later if you want to'
+        'Document agreement with landowner',
+        'Include 5-year renewal option',
+        'Define harvest sharing or rent',
+        'Add future purchase option'
       ],
       timeline: 'Week 5-6',
       color: 'bg-earth-brown-500'

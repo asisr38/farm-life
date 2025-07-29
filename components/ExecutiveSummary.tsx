@@ -8,25 +8,25 @@ const ExecutiveSummary = () => {
     {
       icon: Heart,
       title: 'Live with Purpose',
-      description: 'Connect with the land and discover what truly matters. Grow food that nourishes your body and soul, while building a life that aligns with your values.',
+      description: 'Connect with the land. Grow food that nourishes body and soul.',
       color: 'text-farm-green-600'
     },
     {
       icon: Sprout,
       title: 'Learn by Doing',
-      description: 'Start small and grow with confidence. Leasing land lets you learn organic farming without the pressure of huge investments. Every mistake is a lesson, every harvest a victory.',
+      description: 'Start small. Learn organic farming without huge investments. Every harvest is a victory.',
       color: 'text-valley-blue-600'
     },
     {
       icon: Users,
       title: 'Build Community',
-      description: 'Join a network of like-minded people who care about sustainable living. Share knowledge, tools, and the joy of growing together. You\'ll never feel alone on this journey.',
+      description: 'Join like-minded people. Share knowledge, tools, and the joy of growing together.',
       color: 'text-earth-brown-600'
     },
     {
       icon: Home,
       title: 'Create Your Home',
-      description: 'Transform a simple plot into your sanctuary. Build a life where work and passion merge, where every day brings you closer to the earth and to yourself.',
+      description: 'Transform a simple plot into your sanctuary. Where work and passion merge.',
       color: 'text-farm-green-600'
     }
   ]
@@ -44,10 +44,8 @@ const ExecutiveSummary = () => {
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Why This Matters
           </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            This isn't just about farming—it's about creating a life that feels right. 
-            A life where you wake up knowing you're making a difference, where your work 
-            feeds both your family and your soul. Here's why this journey could change everything.
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Create a life that feels right. Work that feeds your soul.
           </p>
         </motion.div>
 
