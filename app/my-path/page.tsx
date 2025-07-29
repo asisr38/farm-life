@@ -130,13 +130,13 @@ export default function MyPath() {
       </section>
 
       {/* Main Timeline Section */}
-      <section className="py-16 bg-white">
-        <div className="container-custom">
+      <section className="py-8 sm:py-16 bg-white">
+        <div className="container-custom px-4">
           <div className="max-w-4xl mx-auto">
-            {/* Goals Section - Step 1 */}
+            {/* Mobile-First Timeline */}
             <div className="relative">
-              {/* Timeline Line */}
-              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-200 via-blue-200 via-green-200 via-yellow-200 via-red-200 to-indigo-200"></div>
+              {/* Timeline Line - Hidden on mobile, visible on larger screens */}
+              <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-200 via-blue-200 via-green-200 via-yellow-200 via-red-200 to-indigo-200"></div>
               
               {timelineSteps.map((step, stepIndex) => (
                 <motion.div
@@ -145,34 +145,41 @@ export default function MyPath() {
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: stepIndex * 0.2 }}
                   viewport={{ once: true }}
-                  className="relative mb-16 last:mb-0"
+                  className="relative mb-8 sm:mb-16 last:mb-0"
                 >
-                  {/* Timeline Node */}
-                  <div className={`absolute left-6 w-4 h-4 rounded-full bg-gradient-to-r ${step.color} 
+                  {/* Timeline Node - Hidden on mobile, visible on larger screens */}
+                  <div className={`hidden sm:block absolute left-6 w-4 h-4 rounded-full bg-gradient-to-r ${step.color} 
                     border-4 border-white shadow-lg z-10`}></div>
                   
                   {/* Content Card */}
-                  <div className="ml-20">
+                  <div className="sm:ml-20">
                     <motion.div
-                      className={`bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 p-8
+                      className={`bg-white rounded-xl sm:rounded-2xl shadow-lg border-2 transition-all duration-300 p-4 sm:p-8
                         ${activePhase === stepIndex ? 'border-green-200 shadow-xl scale-[1.02]' : 'border-gray-100 hover:border-gray-200 hover:shadow-xl'}`}
                       onHoverStart={() => setActivePhase(stepIndex)}
                     >
+                      {/* Mobile Step Icon */}
+                      <div className="block sm:hidden mb-4">
+                        <div className={`w-12 h-12 mx-auto rounded-full bg-gradient-to-r ${step.color} 
+                          flex items-center justify-center text-white shadow-lg`}>
+                          <step.icon className="w-6 h-6" />
+                        </div>
+                      </div>
                       {/* Header */}
-                      <div className="flex items-start justify-between mb-6">
-                        <div>
-                          <div className="flex items-center mb-2">
-                            <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full mr-3">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6">
+                        <div className="flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center mb-3 sm:mb-2">
+                            <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full mb-2 sm:mb-0 sm:mr-3 self-start">
                               {step.duration}
                             </span>
                             <span className="text-sm text-gray-500">Step {step.id}</span>
                           </div>
-                          <h2 className="text-2xl font-bold text-gray-900 mb-2">{step.title}</h2>
-                          <p className="text-gray-600">{step.description}</p>
+                          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{step.title}</h2>
+                          <p className="text-sm sm:text-base text-gray-600">{step.description}</p>
                         </div>
                         <motion.button
                           onClick={() => togglePhaseCompletion(stepIndex)}
-                          className={`p-2 rounded-full transition-colors duration-200 ${
+                          className={`p-2 rounded-full transition-colors duration-200 mt-2 sm:mt-0 self-start sm:self-auto ${
                             completedPhases.includes(stepIndex) 
                               ? 'bg-green-100 text-green-600' 
                               : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
@@ -186,7 +193,7 @@ export default function MyPath() {
 
                       {/* Step-specific Content */}
                       {stepIndex === 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                           {GOALS.map((goal, goalIndex) => (
                             <motion.div
                               key={goalIndex}
@@ -194,14 +201,14 @@ export default function MyPath() {
                               whileInView={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.6, delay: goalIndex * 0.1 }}
                               viewport={{ once: true }}
-                              className={`p-4 rounded-xl border-2 ${goal.color}`}
+                              className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${goal.color}`}
                             >
-                              <div className="flex items-center mb-3">
-                                <goal.icon className="w-5 h-5 mr-2 text-gray-700" />
-                                <h3 className="font-semibold text-gray-900">{goal.title}</h3>
+                              <div className="flex items-center mb-2 sm:mb-3">
+                                <goal.icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-700" />
+                                <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{goal.title}</h3>
                               </div>
-                              <p className="text-lg font-bold text-green-600 mb-1">{goal.target}</p>
-                              <p className="text-sm text-gray-600">{goal.description}</p>
+                              <p className="text-base sm:text-lg font-bold text-green-600 mb-1">{goal.target}</p>
+                              <p className="text-xs sm:text-sm text-gray-600">{goal.description}</p>
                             </motion.div>
                           ))}
                         </div>
@@ -209,7 +216,7 @@ export default function MyPath() {
 
                       {stepIndex === 4 && (
                         <div className="space-y-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                             {PHASES.map((phase, phaseIndex) => (
                               <motion.div
                                 key={phaseIndex}
@@ -234,7 +241,7 @@ export default function MyPath() {
                       )}
 
                       {stepIndex === 3 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           {ZONES.map((zone, zoneIndex) => (
                             <motion.div
                               key={zoneIndex}
@@ -297,7 +304,7 @@ export default function MyPath() {
             </p>
           </motion.div>
 
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {RISKS.map((risk, index) => (
               <motion.div
                 key={index}
@@ -346,7 +353,7 @@ export default function MyPath() {
           </motion.div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {NEXT_STEPS.map((step, index) => (
                 <motion.div
                   key={index}
