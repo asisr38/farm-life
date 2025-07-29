@@ -9,7 +9,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-farm-green-50 via-white to-valley-blue-50">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-farm-green-50 via-white to-valley-blue-50 pt-14 sm:pt-16">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Floating Orbs */}
@@ -23,7 +23,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             repeat: Infinity,
             ease: "linear"
           }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-farm-green-200/30 to-valley-blue-200/30 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-gradient-to-r from-farm-green-200/30 to-valley-blue-200/30 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -35,7 +35,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             repeat: Infinity,
             ease: "linear"
           }}
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-valley-blue-200/30 to-earth-brown-200/30 rounded-full blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-40 h-40 sm:w-80 sm:h-80 bg-gradient-to-r from-valley-blue-200/30 to-earth-brown-200/30 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -47,7 +47,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             repeat: Infinity,
             ease: "linear"
           }}
-          className="absolute top-1/2 right-1/3 w-64 h-64 bg-gradient-to-r from-earth-brown-200/20 to-farm-green-200/20 rounded-full blur-2xl"
+          className="absolute top-1/2 right-1/3 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-r from-earth-brown-200/20 to-farm-green-200/20 rounded-full blur-2xl"
         />
       </div>
 
@@ -72,12 +72,12 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-6"
           >
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
               <span className="bg-gradient-to-r from-farm-green-600 via-valley-blue-600 to-earth-brown-600 bg-clip-text text-transparent">
                 Grow Your Future
               </span>
               <br />
-              <span className="text-2xl sm:text-3xl lg:text-4xl font-normal text-gray-700 mt-4 block">
+              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-normal text-gray-700 mt-2 sm:mt-4 block">
                 in the Heart of Kathmandu Valley
               </span>
             </h1>
@@ -88,7 +88,7 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl sm:text-2xl mb-12 text-gray-600 max-w-4xl mx-auto leading-relaxed font-light"
+            className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 text-gray-600 max-w-4xl mx-auto leading-relaxed font-light px-4"
           >
             Discover the joy of growing your own food, building community, and living sustainably 
             in one of the most beautiful places on earth. Your journey to a meaningful life starts here.
@@ -99,16 +99,16 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-16 px-4"
           >
             <button
               onClick={onGetStarted}
-              className="group relative px-8 py-4 bg-gradient-to-r from-farm-green-600 to-farm-green-700 text-white font-semibold rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-farm-green-500/25 flex items-center space-x-2"
+              className="group relative w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-farm-green-600 to-farm-green-700 text-white font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-farm-green-500/25 flex items-center justify-center space-x-2"
             >
               <Heart className="h-5 w-5 group-hover:scale-110 transition-transform" />
               <span>Begin Your Journey</span>
             </button>
-            <button className="group px-8 py-4 bg-white/70 backdrop-blur-md border border-white/30 text-gray-700 font-semibold rounded-2xl transition-all duration-300 hover:scale-105 hover:bg-white/80 hover:shadow-xl">
+            <button className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/70 backdrop-blur-md border border-white/30 text-gray-700 font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105 hover:bg-white/80 hover:shadow-xl">
               Learn Our Story
             </button>
           </motion.div>
@@ -118,36 +118,36 @@ const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto px-4"
           >
-            <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-2xl p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105">
+            <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-gradient-to-r from-farm-green-500 to-farm-green-600 rounded-xl">
-                  <Sprout className="h-6 w-6 text-white" />
+                <div className="p-2 sm:p-3 bg-gradient-to-r from-farm-green-500 to-farm-green-600 rounded-lg sm:rounded-xl">
+                  <Sprout className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-1">42%</div>
-              <div className="text-sm text-gray-600 font-medium">Families still connected to the land</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">42%</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Families still connected to the land</div>
             </div>
             
-            <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-2xl p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105">
+            <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-gradient-to-r from-valley-blue-500 to-valley-blue-600 rounded-xl">
-                  <Mountain className="h-6 w-6 text-white" />
+                <div className="p-2 sm:p-3 bg-gradient-to-r from-valley-blue-500 to-valley-blue-600 rounded-lg sm:rounded-xl">
+                  <Mountain className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-1">0.27 ha</div>
-              <div className="text-sm text-gray-600 font-medium">Average family plot - perfect to start</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">0.27 ha</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Average family plot - perfect to start</div>
             </div>
             
-            <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-2xl p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105">
+            <div className="bg-white/40 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/50 transition-all duration-300 hover:scale-105 sm:col-span-2 md:col-span-1">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-gradient-to-r from-earth-brown-500 to-earth-brown-600 rounded-xl">
-                  <Users className="h-6 w-6 text-white" />
+                <div className="p-2 sm:p-3 bg-gradient-to-r from-earth-brown-500 to-earth-brown-600 rounded-lg sm:rounded-xl">
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-1">20-50%</div>
-              <div className="text-sm text-gray-600 font-medium">More people choosing organic food</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">20-50%</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">More people choosing organic food</div>
             </div>
           </motion.div>
         </div>

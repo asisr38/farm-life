@@ -180,12 +180,12 @@ export default function FarmerPerspective() {
               <Heart className="w-4 h-4 mr-2" />
               The Landowner's Journey
             </div>
-            <h1 className="text-5xl sm:text-6xl font-bold mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Your Land, Their Dreams
               </span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed px-4">
               Partner with passionate young farmers to transform your land into a thriving organic farm 
               while securing better returns and preserving your legacy.
             </p>
@@ -193,7 +193,7 @@ export default function FarmerPerspective() {
 
           {/* Timeline Overview */}
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-16">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-12 sm:mb-16 px-4">
               {timelineSteps.map((step, index) => (
                 <motion.div
                   key={step.id}
@@ -203,12 +203,12 @@ export default function FarmerPerspective() {
                   className="text-center group cursor-pointer"
                   onClick={() => setActivePhase(index)}
                 >
-                  <div className={`w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r ${step.color} 
+                  <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3 rounded-full bg-gradient-to-r ${step.color} 
                     flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300
                     ${activePhase === index ? 'ring-4 ring-green-200 scale-110' : ''}`}>
-                    <step.icon className="w-7 h-7" />
+                    <step.icon className="w-5 h-5 sm:w-7 sm:h-7" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{step.title}</h3>
+                  <h3 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1">{step.title}</h3>
                   <p className="text-xs text-gray-500">{step.duration}</p>
                 </motion.div>
               ))}
