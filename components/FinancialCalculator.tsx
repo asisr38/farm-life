@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Heart, TrendingUp, Sprout, Calendar, Users } from 'lucide-react'
+import { Heart, TrendingUp, Sprout, Users } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const FinancialCalculator = () => {

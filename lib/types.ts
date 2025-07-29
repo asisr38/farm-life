@@ -11,7 +11,7 @@ export interface PageNavigationItem {
 
 export interface NavigationProps {
   activeSection?: string
-  onNavigate?: (sectionId: string) => void
+  onNavigate?: (_sectionId: string) => void
 }
 
 // Goal Types

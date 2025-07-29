@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Heart, Sprout, FileText, Home, Users, Leaf } from 'lucide-react'
+import { Heart, Sprout, FileText, Home, Users } from 'lucide-react'
 
 const ActionPlan = () => {
   const [activeStep, setActiveStep] = useState(0)

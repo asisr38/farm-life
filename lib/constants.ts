@@ -1,4 +1,4 @@
-import { Heart, Target, MapPin, Sprout, Users, Calendar, Shield, ArrowRight, CheckCircle, AlertTriangle, Leaf, DollarSign, TrendingUp, Home, Building, Trees } from 'lucide-react'
+import { Heart, Target, Sprout, Users } from 'lucide-react'
 import { NavigationItem, PageNavigationItem, Goal, Phase, Zone, Risk } from './types'
 
 // Site Configuration

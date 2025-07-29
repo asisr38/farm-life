@@ -118,19 +118,19 @@ export function scrollToElement(elementId: string): void {
 /**
  * Debounces a function call
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (..._args: any[]) => any>(
   func: T,
   wait: number
-): (...args: Parameters<T>) => void {
+): (..._args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
   
-  return (...args: Parameters<T>) => {
+  return (..._args: Parameters<T>) => {
     if (timeout) {
       clearTimeout(timeout)
     }
     
     timeout = setTimeout(() => {
-      func(...args)
+      func(..._args)
     }, wait)
   }
 }
