@@ -3,15 +3,20 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Heart, Sprout, FileText, Home, Users } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { t } from '@/lib/intl'
 
 const ActionPlan = () => {
+  const pathname = usePathname()
+  const locale = pathname.startsWith('/ne') ? 'ne' : 'en'
+
   const [activeStep, setActiveStep] = useState(0)
 
   const steps = [
     {
       id: 1,
-      title: 'Listen to Your Heart',
-      description: 'Find a piece of land that speaks to your soul',
+      title: t('action_step1_title', locale as any),
+      description: t('action_step1_desc', locale as any),
       icon: Heart,
       details: [
         'Visit areas, feel the energy',
@@ -24,8 +29,8 @@ const ActionPlan = () => {
     },
     {
       id: 2,
-      title: 'Get to Know Your Land',
-      description: 'Test the soil and water to understand what you\'re working with',
+      title: t('action_step2_title', locale as any),
+      description: t('action_step2_desc', locale as any),
       icon: Sprout,
       details: [
         'Test soil nutrients',
@@ -38,8 +43,8 @@ const ActionPlan = () => {
     },
     {
       id: 3,
-      title: 'Make Your Agreement',
-      description: 'Create a fair arrangement that works for everyone',
+      title: t('action_step3_title', locale as any),
+      description: t('action_step3_desc', locale as any),
       icon: FileText,
       details: [
         'Document agreement with landowner',
@@ -52,8 +57,8 @@ const ActionPlan = () => {
     },
     {
       id: 4,
-      title: 'Make It Official',
-      description: 'Register your agreement at the local office',
+      title: t('action_step4_title', locale as any),
+      description: t('action_step4_desc', locale as any),
       icon: FileText,
       details: [
         'Take your agreement to the Ward Office',
@@ -66,8 +71,8 @@ const ActionPlan = () => {
     },
     {
       id: 5,
-      title: 'Build Your Dream Step by Step',
-      description: 'Start small and grow as you learn',
+      title: t('action_step5_title', locale as any),
+      description: t('action_step5_desc', locale as any),
       icon: Home,
       details: [
         'Begin with drip irrigation and simple tunnels',
@@ -80,8 +85,8 @@ const ActionPlan = () => {
     },
     {
       id: 6,
-      title: 'Connect with Your Community',
-      description: 'Find people who want what you\'re growing',
+      title: t('action_step6_title', locale as any),
+      description: t('action_step6_desc', locale as any),
       icon: Users,
       details: [
         'Talk to restaurants about buying your vegetables',
@@ -105,11 +110,10 @@ const ActionPlan = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Your Journey Begins Here
+            {t('action_title', locale as any)}
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Every great adventure starts with a single step. Here's your roadmap to creating 
-            the life you've always dreamed of—one that's connected to the earth and filled with meaning.
+            {t('action_subtitle', locale as any)}
           </p>
         </motion.div>
 
@@ -237,7 +241,7 @@ const ActionPlan = () => {
               Every mistake is a lesson, every challenge makes you stronger, and every harvest brings you 
               closer to the life you're meant to live.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
               <div>
                 <Heart className="h-8 w-8 text-farm-green-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Trust Your Intuition</p>
@@ -251,6 +255,17 @@ const ActionPlan = () => {
                 <p className="text-sm text-gray-400">Ask for Help</p>
               </div>
             </div>
+            <button
+              onClick={() => {
+                const element = document.getElementById('contact')
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' })
+                }
+              }}
+              className="bg-gradient-to-r from-farm-green-600 to-valley-blue-600 text-white font-semibold py-4 px-8 rounded-xl hover:from-farm-green-700 hover:to-valley-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              Connect with Our Community
+            </button>
           </div>
         </motion.div>
       </div>

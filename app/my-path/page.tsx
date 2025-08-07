@@ -272,8 +272,28 @@ export default function MyPath() {
                         whileInView={{ opacity: 1 }}
                         transition={{ duration: 0.6, delay: 0.3 }}
                       >
-                        <button className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium">
-                          Learn More
+                        <button 
+                          onClick={() => {
+                            // Navigate based on step
+                            if (stepIndex === 0) {
+                              // Goals - go to calculator
+                              window.location.href = '/#calculator'
+                            } else if (stepIndex === 2) {
+                              // Find land - go to contact for help
+                              window.location.href = '/#contact'
+                            } else if (stepIndex === 4) {
+                              // Implementation - go to action plan
+                              window.location.href = '/#action-plan'
+                            } else {
+                              // Default - go to contact
+                              window.location.href = '/#contact'
+                            }
+                          }}
+                          className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium"
+                        >
+                          {stepIndex === 0 ? 'Calculate ROI' : 
+                           stepIndex === 2 ? 'Find Help' :
+                           stepIndex === 4 ? 'See Action Plan' : 'Get Started'}
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </button>
                       </motion.div>
@@ -381,7 +401,12 @@ export default function MyPath() {
             viewport={{ once: true }}
             className="text-center mt-16"
           >
-            <button className="bg-white text-green-600 hover:bg-gray-50 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg">
+            <button 
+              onClick={() => {
+                window.location.href = '/#action-plan'
+              }}
+              className="bg-white text-green-600 hover:bg-gray-50 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg"
+            >
               Start Your Journey Today
             </button>
           </motion.div>

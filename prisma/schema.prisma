@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  farmer
+  landowner
+  admin
+  viewer
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String?
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(farmer)
+  createdAt    DateTime @default(now())
+  leases       Lease[]  @relation("farmerLeases")
+  plotsOwned   Plot[]   @relation("OwnerPlots")
+  sessions     Session[]
+  accounts     Account[]
+  @@map("users")
+}
+
+model Plot {
+  id       String   @id @default(uuid())
+  name     String
+  location Json?
+  sizeM2   Float?
+  ownerId  String
+  owner    User     @relation("OwnerPlots", fields: [ownerId], references: [id])
+  leases   Lease[]  @relation("plotLeases")
+  crops    Crop[]
+  @@map("plots")
+}
+
+model Lease {
+  id        String   @id @default(uuid())
+  plotId    String
+  farmerId  String
+  model     String
+  startDate DateTime
+  endDate   DateTime
+  termsJson Json?
+  plot      Plot   @relation("plotLeases", fields: [plotId], references: [id])
+  farmer    User   @relation("farmerLeases", fields: [farmerId], references: [id])
+  @@map("leases")
+}
+
+model Crop {
+  id           String   @id @default(uuid())
+  plotId       String
+  name         String
+  variety      String?
+  plantingDate DateTime?
+  plot         Plot   @relation(fields: [plotId], references: [id])
+  yields       Yield[]
+  @@map("crops")
+}
+
+model Yield {
+  id         String   @id @default(uuid())
+  cropId     String
+  date       DateTime
+  quantityKg Float
+  revenueNpr Float?
+  crop       Crop   @relation(fields: [cropId], references: [id])
+  @@map("yields")
+}
+
+// NextAuth default models
+model Account {
+  id                Int       @id @default(autoincrement())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?   @db.Text
+  access_token      String?   @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?   @db.Text
+  session_state     String?
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           Int       @id @default(autoincrement())
+  sessionToken String    @unique
+  userId       String
+  expires      DateTime
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

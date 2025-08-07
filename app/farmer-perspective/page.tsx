@@ -425,10 +425,25 @@ export default function FarmerPerspective() {
               Connect with passionate young farmers today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-green-600 hover:bg-gray-50 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg">
+              <button 
+                onClick={() => {
+                  const element = document.getElementById('contact')
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' })
+                  } else {
+                    window.location.href = '/#contact'
+                  }
+                }}
+                className="bg-white text-green-600 hover:bg-gray-50 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg"
+              >
                 Find Farmers Now
               </button>
-              <button className="border-2 border-white text-white hover:bg-white/10 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg">
+              <button 
+                onClick={() => {
+                  window.location.href = '/'
+                }}
+                className="border-2 border-white text-white hover:bg-white/10 font-semibold py-4 px-8 rounded-xl transition-colors duration-200 text-lg"
+              >
                 Learn More
               </button>
             </div>

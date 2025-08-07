@@ -4,8 +4,13 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Heart, TrendingUp, Sprout, Users } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { usePathname } from 'next/navigation'
+import { t } from '@/lib/intl'
 
 const FinancialCalculator = () => {
+  const pathname = usePathname()
+  const locale = pathname.startsWith('/ne') ? 'ne' : 'en'
+
   const [inputs, setInputs] = useState({
     landSize: 5, // ropani
     pathType: 'simple-lease',
@@ -59,11 +64,10 @@ const FinancialCalculator = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Your Journey to Financial Freedom
+            {t('calc_title', locale as any)}
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            This isn't about getting rich—it's about building a life where your work sustains you 
-            and your family. Use this tool to understand your path to financial independence.
+            {t('calc_subtitle', locale as any)}
           </p>
         </motion.div>
 
@@ -85,7 +89,7 @@ const FinancialCalculator = () => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Land Size (Ropani)
+                    {t('calc_land_size', locale as any)}
                   </label>
                   <input
                     type="range"
@@ -180,99 +184,78 @@ const FinancialCalculator = () => {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            {/* Journey Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {journey.map((year, index) => (
-                <div key={index} className="card text-center">
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {year.year}
-                  </div>
-                  <div className={`text-lg font-semibold ${
-                    year.balance >= 0 ? 'text-farm-green-600' : 'text-red-600'
-                  }`}>
-                    {year.balance >= 0 ? '+' : ''}{year.balance.toFixed(1)} Lakh
-                  </div>
-                  <div className="text-sm text-gray-500">Your Balance</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Journey Chart */}
             <div className="card">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <TrendingUp className="h-5 w-5 mr-2" />
-                Your Journey to Independence
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <TrendingUp className="h-6 w-6 mr-2" />
+                {t('calc_projection', locale as any)}
               </h3>
-              <div className="h-64">
+
+              {/* Chart */}
+              <div className="h-64 mb-6">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={journey}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
                     <YAxis />
                     <Tooltip 
-                      formatter={(value: number) => [`${value.toFixed(1)} Lakh`, '']}
+                      formatter={(value: number) => [`${value.toFixed(1)} Lakh NPR`, '']}
                       labelFormatter={(label) => `${label}`}
                     />
                     <Line 
                       type="monotone" 
-                      dataKey="harvest" 
-                      stroke="#22c55e" 
-                      strokeWidth={2}
-                      name="Your Harvest"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="expenses" 
-                      stroke="#ef4444" 
-                      strokeWidth={2}
-                      name="Your Costs"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="balance" 
-                      stroke="#3b82f6" 
+                      dataKey="cumulative" 
+                      stroke="#16a34a" 
                       strokeWidth={3}
-                      name="Your Balance"
+                      dot={{ fill: '#16a34a', strokeWidth: 2, r: 6 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-            </div>
 
-            {/* Key Insights */}
-            <div className="card">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <Sprout className="h-5 w-5 mr-2" />
-                Your Path to Freedom
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Total Investment (Year 1)</span>
-                  <span className="font-semibold text-gray-900">
-                    {(inputs.setupCost + inputs.landSize * inputs.leaseRate).toFixed(1)} Lakh
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">When You'll Break Even</span>
-                  <span className="font-semibold text-gray-900">
-                    {journey[1].cumulative >= 0 ? 'Year 2' : 'Year 3+'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">3-Year Total Balance</span>
-                  <span className={`font-semibold ${
-                    journey[2].cumulative >= 0 ? 'text-farm-green-600' : 'text-red-600'
-                  }`}>
-                    {journey[2].cumulative >= 0 ? '+' : ''}{journey[2].cumulative.toFixed(1)} Lakh
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Your Return on Investment</span>
-                  <span className={`font-semibold ${
-                    journey[2].cumulative >= 0 ? 'text-farm-green-600' : 'text-red-600'
-                  }`}>
-                    {((journey[2].cumulative / (inputs.setupCost + inputs.landSize * inputs.leaseRate)) * 100).toFixed(1)}%
-                  </span>
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {journey.map((year, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm font-medium text-gray-600 mb-1">{year.year}</div>
+                    <div className="text-xl font-bold text-gray-900 mb-2">
+                      {year.cumulative.toFixed(1)} Lakh
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {year.balance >= 0 ? t('calc_positive', locale as any) : t('calc_investment', locale as any)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Encouragement Message */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-farm-green-50 to-valley-blue-50 rounded-lg">
+                <p className="text-sm text-gray-700 mb-3">
+                  <strong>Remember:</strong> These numbers tell a story of transformation, not just profit. 
+                  You're not just calculating returns—you're planning a life of meaning, connection, and purpose.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => {
+                      const element = document.getElementById('action-plan')
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' })
+                      }
+                    }}
+                    className="flex-1 bg-gradient-to-r from-farm-green-600 to-farm-green-700 text-white font-semibold py-3 px-4 rounded-lg hover:from-farm-green-700 hover:to-farm-green-800 transition-all duration-200 text-sm"
+                  >
+                    {t('calc_see_plan', locale as any)}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const element = document.getElementById('contact')
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' })
+                      }
+                    }}
+                    className="flex-1 bg-white border border-farm-green-600 text-farm-green-600 font-semibold py-3 px-4 rounded-lg hover:bg-farm-green-50 transition-all duration-200 text-sm"
+                  >
+                    {t('calc_get_help', locale as any)}
+                  </button>
                 </div>
               </div>
             </div>
