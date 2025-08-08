@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
+/* Custom CSS variables */
+:root {
+  --farm-green-50: #f0fdf4;
+  --farm-green-100: #dcfce7;
+  --farm-green-200: #bbf7d0;
+  --farm-green-300: #86efac;
+  --farm-green-400: #4ade80;
+  --farm-green-500: #22c55e;
+  --farm-green-600: #16a34a;
+  --farm-green-700: #15803d;
+  --farm-green-800: #166534;
+  --farm-green-900: #14532d;
+  --farm-green-950: #052e16;
+  
+  --valley-blue-50: #eff6ff;
+  --valley-blue-100: #dbeafe;
+  --valley-blue-200: #bfdbfe;
+  --valley-blue-300: #93c5fd;
+  --valley-blue-400: #60a5fa;
+  --valley-blue-500: #3b82f6;
+  --valley-blue-600: #2563eb;
+  --valley-blue-700: #1d4ed8;
+  --valley-blue-800: #1e40af;
+  --valley-blue-900: #1e3a8a;
+  --valley-blue-950: #172554;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700&display=swap');
 
 @layer base {
@@ -194,22 +224,32 @@
   }
 }
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #22c55e, #3b82f6);
-  border-radius: 3px;
+  background: #c1c1c1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #16a34a, #2563eb);
+  background: #a8a8a8;
+}
+
+/* Leaflet marker fixes */
+.leaflet-default-icon-path {
+  background-image: url('/images/marker-icon.png');
 }
 
 /* Selection styling */

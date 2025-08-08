@@ -6,6 +6,7 @@ import { Leaf, Sprout, Wheat } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import YieldChart from "@/components/dashboard/YieldChart";
 import PlotCard from "@/components/dashboard/PlotCard";
+import NepalMap from "@/components/dashboard/NepalMap";
 import { format } from "date-fns";
 
 export default async function DashboardPage() {
@@ -66,6 +67,24 @@ export default async function DashboardPage() {
     .map(([date, total]) => ({ date, total }))
     .sort((a, b) => (a.date < b.date ? -1 : 1));
 
+  // Prepare plots data for map
+  const plotsForMap = plots.map((plot) => {
+    const plotYield = plot.crops.reduce((acc, crop) => {
+      return (
+        acc + crop.yields.reduce((yAcc, y) => yAcc + y.quantityKg, 0)
+      );
+    }, 0);
+
+    return {
+      id: plot.id,
+      name: plot.name,
+      sizeM2: plot.sizeM2,
+      cropsCount: plot.crops.length,
+      totalYield: plotYield,
+      location: plot.location as { lat: number; lng: number } | null,
+    };
+  });
+
   return (
     <div className="mx-auto max-w-6xl space-y-8 p-6">
       <h1 className="text-3xl font-bold text-farm-green-700">Dashboard</h1>
@@ -89,8 +108,11 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Yield Chart */}
-      <YieldChart data={yieldData} />
+      {/* Map and Chart Grid */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <NepalMap plots={plotsForMap} />
+        <YieldChart data={yieldData} />
+      </div>
 
       {/* Plots list */}
       <div>
@@ -114,7 +136,14 @@ export default async function DashboardPage() {
                   sizeM2={plot.sizeM2}
                   cropsCount={plot.crops.length}
                   totalYield={plotYield}
-                />
+                >
+                  <Link
+                    href={`/plots/${plot.id}`}
+                    className="mt-2 inline-block text-sm text-farm-green-600 underline"
+                  >
+                    View details
+                  </Link>
+                </PlotCard>
               );
             })}
           </div>

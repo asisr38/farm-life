@@ -31,12 +31,15 @@ model User {
 model Plot {
   id       String   @id @default(uuid())
   name     String
-  location Json?
+  // Replace JSON location with numeric coordinates
+  lat      Float?
+  lng      Float?
   sizeM2   Float?
   ownerId  String
-  owner    User     @relation("OwnerPlots", fields: [ownerId], references: [id])
+  owner    User     @relation("OwnerPlots", fields: [ownerId], references: [id], onDelete: Cascade)
   leases   Lease[]  @relation("plotLeases")
   crops    Crop[]
+  @@index([ownerId])
   @@map("plots")
 }
 
@@ -48,8 +51,10 @@ model Lease {
   startDate DateTime
   endDate   DateTime
   termsJson Json?
-  plot      Plot   @relation("plotLeases", fields: [plotId], references: [id])
-  farmer    User   @relation("farmerLeases", fields: [farmerId], references: [id])
+  plot      Plot   @relation("plotLeases", fields: [plotId], references: [id], onDelete: Cascade)
+  farmer    User   @relation("farmerLeases", fields: [farmerId], references: [id], onDelete: Cascade)
+  @@index([plotId])
+  @@index([farmerId])
   @@map("leases")
 }
 
@@ -59,8 +64,9 @@ model Crop {
   name         String
   variety      String?
   plantingDate DateTime?
-  plot         Plot   @relation(fields: [plotId], references: [id])
+  plot         Plot   @relation(fields: [plotId], references: [id], onDelete: Cascade)
   yields       Yield[]
+  @@index([plotId])
   @@map("crops")
 }
 
@@ -70,7 +76,8 @@ model Yield {
   date       DateTime
   quantityKg Float
   revenueNpr Float?
-  crop       Crop   @relation(fields: [cropId], references: [id])
+  crop       Crop   @relation(fields: [cropId], references: [id], onDelete: Cascade)
+  @@index([cropId, date])
   @@map("yields")
 }
 

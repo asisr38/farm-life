@@ -2,12 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { z } from "zod";
+
+const createPlotSchema = z.object({
+  name: z.string().min(1),
+  sizeM2: z.number().optional().nullable(),
+  lat: z.number().optional().nullable(),
+  lng: z.number().optional().nullable(),
+});
 
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  // Admins see all, farmers see theirs, landowners see owned
   const filters: any = {};
   if (session.user?.role === "farmer") {
     filters.leases = { some: { farmerId: session.user.id } };
@@ -31,20 +38,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
-  const body = await request.json();
-  const { name, sizeM2, location } = body;
-
-  if (!name) {
-    return NextResponse.json({ message: "Name required" }, { status: 400 });
+  const json = await request.json();
+  const parse = createPlotSchema.safeParse(json);
+  if (!parse.success) {
+    return NextResponse.json({ error: { code: "INVALID_BODY", details: parse.error.flatten() } }, { status: 400 });
   }
+  const { name, sizeM2, lat, lng } = parse.data;
 
   const plot = await prisma.plot.create({
     data: {
       name,
-      sizeM2: sizeM2 ? Number(sizeM2) : null,
-      ownerId: session.user.id!,
-      location: location ?? null,
-    },
+      sizeM2: sizeM2 ?? null,
+      ownerId: session.user!.id!,
+      lat: lat ?? null,
+      lng: lng ?? null,
+    } as any,
   });
 
   return NextResponse.json(plot, { status: 201 });

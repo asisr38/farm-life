@@ -2,14 +2,26 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+const createCropSchema = z.object({
+  plotId: z.string().uuid(),
+  name: z.string().min(1),
+  variety: z.string().optional().nullable(),
+  plantingDate: z.string().datetime().optional().nullable(),
+});
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
-  const { plotId, name, variety, plantingDate } = body;
-  if (!plotId || !name) return NextResponse.json({ message: "Missing fields" }, { status: 400 });
+  const json = await request.json();
+  const parse = createCropSchema.safeParse(json);
+  if (!parse.success) {
+    return NextResponse.json({ error: { code: "INVALID_BODY", details: parse.error.flatten() } }, { status: 400 });
+  }
+
+  const { plotId, name, variety, plantingDate } = parse.data;
 
   // check permissions: only plot owner or farmer leasing the plot can add crop
   const plot = await prisma.plot.findUnique({
@@ -33,7 +45,7 @@ export async function POST(request: Request) {
     data: {
       plotId,
       name,
-      variety,
+      variety: variety ?? undefined,
       plantingDate: plantingDate ? new Date(plantingDate) : undefined,
     },
   });

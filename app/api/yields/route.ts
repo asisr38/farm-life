@@ -2,15 +2,26 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+const createYieldSchema = z.object({
+  cropId: z.string().uuid(),
+  date: z.string().datetime().optional().nullable(),
+  quantityKg: z.number().nonnegative(),
+  revenueNpr: z.number().optional().nullable(),
+});
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const { cropId, date, quantityKg, revenueNpr } = await request.json();
-  if (!cropId || quantityKg == null) {
-    return NextResponse.json({ message: "Missing fields" }, { status: 400 });
+  const json = await request.json();
+  const parse = createYieldSchema.safeParse(json);
+  if (!parse.success) {
+    return NextResponse.json({ error: { code: "INVALID_BODY", details: parse.error.flatten() } }, { status: 400 });
   }
+
+  const { cropId, date, quantityKg, revenueNpr } = parse.data;
 
   // Verify permission: farmer leasing crop's plot
   const crop = await prisma.crop.findUnique({
@@ -36,7 +47,7 @@ export async function POST(request: Request) {
       cropId,
       date: date ? new Date(date) : new Date(),
       quantityKg: Number(quantityKg),
-      revenueNpr: revenueNpr ? Number(revenueNpr) : null,
+      revenueNpr: revenueNpr != null ? Number(revenueNpr) : null,
     },
   });
   return NextResponse.json(yieldRecord, { status: 201 });
