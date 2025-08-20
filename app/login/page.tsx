@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/Button";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 
 const schema = z.object({
@@ -16,7 +16,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginInner() {
   const {
     register,
     handleSubmit,
@@ -90,5 +90,13 @@ export default function LoginPage() {
         </p>
       </form>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}>
+      <LoginInner />
+    </Suspense>
   );
 }

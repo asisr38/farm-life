@@ -38,6 +38,8 @@ export default async function DashboardPage() {
           yields: true,
         },
       },
+      // include numeric coordinates if present
+      // types still do not add .location, so we'll map to lat/lng below
     },
   });
 
@@ -81,7 +83,7 @@ export default async function DashboardPage() {
       sizeM2: plot.sizeM2,
       cropsCount: plot.crops.length,
       totalYield: plotYield,
-      location: plot.location as { lat: number; lng: number } | null,
+      location: plot.lat != null && plot.lng != null ? { lat: plot.lat as number, lng: plot.lng as number } : null,
     };
   });
 
@@ -136,14 +138,7 @@ export default async function DashboardPage() {
                   sizeM2={plot.sizeM2}
                   cropsCount={plot.crops.length}
                   totalYield={plotYield}
-                >
-                  <Link
-                    href={`/plots/${plot.id}`}
-                    className="mt-2 inline-block text-sm text-farm-green-600 underline"
-                  >
-                    View details
-                  </Link>
-                </PlotCard>
+                />
               );
             })}
           </div>

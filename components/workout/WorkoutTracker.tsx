@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 type WorkoutRow = {
   id: string
@@ -423,24 +423,24 @@ const WorkoutTracker: React.FC = () => {
     releaseWakeLock()
   }
 
-  const isDayComplete = (dayName: string): boolean => {
+  const isDayComplete = useCallback((dayName: string): boolean => {
     const rows = plan.filter((r) => r.day === dayName)
     if (rows.length === 0) return false
     return rows.every((r) => (progress[r.id]?.setsCompleted ?? 0) >= r.sets)
-  }
+  }, [plan, progress])
 
-  const isPhaseComplete = (phaseName: string): boolean => {
+  const isPhaseComplete = useCallback((phaseName: string): boolean => {
     const list = phaseToDays[phaseName] || []
     if (list.length === 0) return false
     return list.every((d) => isDayComplete(d))
-  }
+  }, [isDayComplete, phaseToDays])
 
   const currentPhaseName = useMemo(() => {
     for (const ph of phaseOrder) {
       if (!isPhaseComplete(ph)) return ph
     }
     return phaseOrder[phaseOrder.length - 1] || 'Unspecified'
-  }, [phaseOrder, progress, phaseToDays])
+  }, [phaseOrder, isPhaseComplete])
 
   const handleStartNextPhase = () => {
     const idx = Math.max(0, phaseOrder.indexOf(currentPhaseName))
@@ -587,7 +587,13 @@ const WorkoutTracker: React.FC = () => {
 
   const handleStartWorkout = () => {
     setIsWarmExpanded(false)
-    const nextId = getNextIncompleteId()
+    const nextId = (() => {
+      for (const r of filtered) {
+        const done = progress[r.id]?.setsCompleted ?? 0
+        if (done < r.sets) return r.id
+      }
+      return null
+    })()
     if (nextId) scrollToExercise(nextId)
   }
 
