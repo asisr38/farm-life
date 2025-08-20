@@ -440,7 +440,7 @@ const WorkoutTracker: React.FC = () => {
       if (!isPhaseComplete(ph)) return ph
     }
     return phaseOrder[phaseOrder.length - 1] || 'Unspecified'
-  }, [phaseOrder, progress, phaseToDays, isPhaseComplete])
+  }, [phaseOrder])
 
   const handleStartNextPhase = () => {
     const idx = Math.max(0, phaseOrder.indexOf(currentPhaseName))
