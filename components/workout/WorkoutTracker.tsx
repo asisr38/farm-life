@@ -329,7 +329,7 @@ const WorkoutTracker: React.FC = () => {
     const id = getNextIncompleteId()
     if (!id) return null
     return filtered.find((r) => r.id === id) || null
-  }, [filtered, progress])
+  }, [filtered, progress, getNextIncompleteId])
 
   const saveSession = (next: SessionState | null) => {
     setSession(next)
@@ -361,14 +361,7 @@ const WorkoutTracker: React.FC = () => {
     } catch {}
   }
 
-  const handleStartPlan = () => {
-    if (days.length === 0) return
-    const dayName = days[0]
-    const next: SessionState = { currentDayName: dayName, accumulatedMs: 0, lastResumeAtMs: Date.now(), isPaused: false }
-    saveSession(next)
-    setSelectedDay(dayName)
-    requestWakeLock()
-  }
+  // removed handleStartPlan (auto-start on mount)
 
   const handleTogglePause = () => {
     if (!session) return
@@ -453,7 +446,7 @@ const WorkoutTracker: React.FC = () => {
       if (!isPhaseComplete(ph)) return ph
     }
     return phaseOrder[phaseOrder.length - 1] || 'Unspecified'
-  }, [phaseOrder, progress, phaseToDays])
+  }, [phaseOrder, progress, phaseToDays, isPhaseComplete])
 
   const handleStartNextPhase = () => {
     const idx = Math.max(0, phaseOrder.indexOf(currentPhaseName))
@@ -481,26 +474,7 @@ const WorkoutTracker: React.FC = () => {
     saveSession(next)
   }
 
-  const handleUploadJson: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const text = await file.text()
-    let data: any
-    try {
-      data = JSON.parse(text)
-    } catch {
-      setPlanError('Invalid JSON file.')
-      return
-    }
-    const rows = toWorkoutRowsFromJson(data)
-    if (rows.length > 0) {
-      setPlan(rows)
-      setSelectedDay(rows[0].day)
-      setPlanError('')
-    } else {
-      setPlanError('JSON parsed but no exercises found. Expected an array of exercises or an object with days.')
-    }
-  }
+  // removed upload handler (personal use)
 
   const handleAdjustSet = (id: string, delta: number, max: number) => {
     setProgress((prev) => {

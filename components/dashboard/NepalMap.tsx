@@ -28,7 +28,7 @@ interface Plot {
 
 interface NepalMapProps {
   plots: Plot[];
-  onPlotSelect?: (plotId: string) => void;
+  onPlotSelect?: (_plotId: string) => void;
   selectedPlotId?: string;
 }
 
