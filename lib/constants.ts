@@ -21,6 +21,7 @@ export const HOME_NAV_ITEMS: NavigationItem[] = [
 export const PAGE_NAV_ITEMS: PageNavigationItem[] = [
   { href: '/my-path', label: 'My Journey' },
   { href: '/farmer-perspective', label: 'For Landowners' },
+  { href: '/workout', label: 'Workout Tracker' },
 ]
 
 // Goals Data for My Path Page

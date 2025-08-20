@@ -81,10 +81,7 @@ const FinancialCalculator = () => {
             className="space-y-6"
           >
             <div className="card">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <Heart className="h-6 w-6 mr-2" />
-                Your Dream Parameters
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center"><Heart className="h-6 w-6 mr-2" />{t('calc_params_title', locale as any)}</h3>
 
               <div className="space-y-6">
                 <div>
@@ -107,9 +104,7 @@ const FinancialCalculator = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Path
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('calc_path_label', locale as any)}</label>
                   <select
                     value={inputs.pathType}
                     onChange={(e) => handleInputChange('pathType', e.target.value)}
@@ -122,9 +117,7 @@ const FinancialCalculator = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Annual Land Cost (Lakh/Ropani/Year)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('calc_annual_land_cost', locale as any)}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -135,9 +128,7 @@ const FinancialCalculator = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Harvest Potential (Lakh/Year at Full Capacity)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('calc_harvest_potential', locale as any)}</label>
                   <input
                     type="number"
                     step="0.5"
@@ -148,9 +139,7 @@ const FinancialCalculator = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Annual Living & Farm Costs (Lakh/Year at Full Capacity)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('calc_annual_costs', locale as any)}</label>
                   <input
                     type="number"
                     step="0.5"
@@ -161,9 +150,7 @@ const FinancialCalculator = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Initial Setup Investment (Lakh)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('calc_initial_setup', locale as any)}</label>
                   <input
                     type="number"
                     step="0.5"
@@ -216,7 +203,7 @@ const FinancialCalculator = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {journey.map((year, index) => (
                   <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                    <div className="text-sm font-medium text-gray-600 mb-1">{year.year}</div>
+                    <div className="text-sm font-medium text-gray-600 mb-1">{index === 0 ? t('calc_year1_label', locale as any) : index === 1 ? t('calc_year2_label', locale as any) : t('calc_year3_label', locale as any)}</div>
                     <div className="text-xl font-bold text-gray-900 mb-2">
                       {year.cumulative.toFixed(1)} Lakh
                     </div>
@@ -229,10 +216,7 @@ const FinancialCalculator = () => {
 
               {/* Encouragement Message */}
               <div className="mt-6 p-4 bg-gradient-to-r from-farm-green-50 to-valley-blue-50 rounded-lg">
-                <p className="text-sm text-gray-700 mb-3">
-                  <strong>Remember:</strong> These numbers tell a story of transformation, not just profit. 
-                  You're not just calculating returns—you're planning a life of meaning, connection, and purpose.
-                </p>
+                <p className="text-sm text-gray-700 mb-3"><strong>{t('calc_remember_prefix', locale as any)}</strong> {t('calc_remember_body', locale as any)}</p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={() => {
@@ -271,27 +255,12 @@ const FinancialCalculator = () => {
           className="text-center mt-16"
         >
           <div className="bg-gradient-to-r from-farm-green-600 to-valley-blue-600 rounded-2xl p-8 lg:p-12 text-white">
-            <h3 className="text-3xl font-bold mb-4">
-              Remember What Matters
-            </h3>
-            <p className="text-xl mb-8 text-green-100">
-              These numbers are just a guide. The real value is in the life you'll build— 
-              the food you'll grow, the community you'll create, and the peace you'll find 
-              in living close to the earth.
-            </p>
+              <h3 className="text-3xl font-bold mb-4">{t('calc_remember_heading', locale as any)}</h3>
+            <p className="text-xl mb-8 text-green-100">{t('calc_remember_body', locale as any)}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <Heart className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-sm">Follow Your Heart</p>
-              </div>
-              <div>
-                <Sprout className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-sm">Start Small, Dream Big</p>
-              </div>
-              <div>
-                <Users className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-sm">Build Community</p>
-              </div>
+              <div><Heart className="h-8 w-8 mx-auto mb-2" /><p className="text-sm">{t('calc_bullet_follow', locale as any)}</p></div>
+              <div><Sprout className="h-8 w-8 mx-auto mb-2" /><p className="text-sm">{t('calc_bullet_start_small', locale as any)}</p></div>
+              <div><Users className="h-8 w-8 mx-auto mb-2" /><p className="text-sm">{t('calc_bullet_community', locale as any)}</p></div>
             </div>
           </div>
         </motion.div>

@@ -2,31 +2,36 @@
 
 import { motion } from 'framer-motion'
 import { Heart, Sprout, Users, Home } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { t } from '@/lib/intl'
 
 const ExecutiveSummary = () => {
+  const pathname = usePathname()
+  const locale = pathname.startsWith('/ne') ? 'ne' : 'en'
+
   const reasons = [
     {
       icon: Heart,
-      title: 'Live with Purpose',
-      description: 'Connect with the land. Grow food that nourishes body and soul.',
+      title: t('exec_reason1_title', locale as any),
+      description: t('exec_reason1_desc', locale as any),
       color: 'text-farm-green-600'
     },
     {
       icon: Sprout,
-      title: 'Learn by Doing',
-      description: 'Start small. Learn organic farming without huge investments. Every harvest is a victory.',
+      title: t('exec_reason2_title', locale as any),
+      description: t('exec_reason2_desc', locale as any),
       color: 'text-valley-blue-600'
     },
     {
       icon: Users,
-      title: 'Build Community',
-      description: 'Join like-minded people. Share knowledge, tools, and the joy of growing together.',
+      title: t('exec_reason3_title', locale as any),
+      description: t('exec_reason3_desc', locale as any),
       color: 'text-earth-brown-600'
     },
     {
       icon: Home,
-      title: 'Create Your Home',
-      description: 'Transform a simple plot into your sanctuary. Where work and passion merge.',
+      title: t('exec_reason4_title', locale as any),
+      description: t('exec_reason4_desc', locale as any),
       color: 'text-farm-green-600'
     }
   ]
@@ -42,10 +47,10 @@ const ExecutiveSummary = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Why This Matters
+            {t('exec_title', locale as any)}
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Create a life that feels right. Work that feeds your soul.
+            {t('exec_subtitle', locale as any)}
           </p>
         </motion.div>
 
@@ -81,26 +86,26 @@ const ExecutiveSummary = () => {
           className="bg-gradient-to-r from-farm-green-50 to-valley-blue-50 rounded-2xl p-8 lg:p-12"
         >
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-8">
-            Your Journey to a Meaningful Life
+            {t('exec_journey_title', locale as any)}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-farm-green-600 mb-2">Year 1</div>
-              <div className="text-lg text-gray-600">Learning & Growing</div>
+              <div className="text-4xl font-bold text-farm-green-600 mb-2">{t('exec_year1_label', locale as any)}</div>
+              <div className="text-lg text-gray-600">{t('exec_year1_desc', locale as any)}</div>
               <div className="text-2xl font-semibold text-gray-900 mt-2">-3 Lakh NPR</div>
-              <div className="text-sm text-gray-500">Investment in your future</div>
+              <div className="text-sm text-gray-500">{t('exec_year1_note', locale as any)}</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-valley-blue-600 mb-2">Year 2</div>
-              <div className="text-lg text-gray-600">Finding Your Rhythm</div>
+              <div className="text-4xl font-bold text-valley-blue-600 mb-2">{t('exec_year2_label', locale as any)}</div>
+              <div className="text-lg text-gray-600">{t('exec_year2_desc', locale as any)}</div>
               <div className="text-2xl font-semibold text-gray-900 mt-2">+4.5 Lakh NPR</div>
-              <div className="text-sm text-gray-500">Your first harvest of success</div>
+              <div className="text-sm text-gray-500">{t('exec_year2_note', locale as any)}</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-earth-brown-600 mb-2">Year 3</div>
-              <div className="text-lg text-gray-600">Living Your Dream</div>
+              <div className="text-4xl font-bold text-earth-brown-600 mb-2">{t('exec_year3_label', locale as any)}</div>
+              <div className="text-lg text-gray-600">{t('exec_year3_desc', locale as any)}</div>
               <div className="text-2xl font-semibold text-gray-900 mt-2">+6 Lakh NPR</div>
-              <div className="text-sm text-gray-500">A sustainable, fulfilling life</div>
+              <div className="text-sm text-gray-500">{t('exec_year3_note', locale as any)}</div>
             </div>
           </div>
         </motion.div>

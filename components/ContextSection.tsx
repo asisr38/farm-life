@@ -2,62 +2,67 @@
 
 import { motion } from 'framer-motion'
 import { Heart, Users, MapPin, Sprout } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { t } from '@/lib/intl'
 
 const ContextSection = () => {
+  const pathname = usePathname()
+  const locale = pathname.startsWith('/ne') ? 'ne' : 'en'
+
   const currentState = [
     {
       icon: Users,
-      title: 'Young People Leaving',
+      title: t('context_current1_title', locale as any),
       value: '11%',
-      description: 'Farmers under 35 years of age',
-      story: 'Most youth are leaving for cities, but the land is calling them back',
+      description: t('context_current1_desc', locale as any),
+      story: t('context_current1_story', locale as any),
       color: 'text-farm-green-600'
     },
     {
       icon: MapPin,
-      title: 'Land Being Lost',
+      title: t('context_current2_title', locale as any),
       value: '20-25%',
-      description: 'Cropland lost to development over 20 years',
-      story: 'Precious farmland is disappearing, but we can save what remains',
+      description: t('context_current2_desc', locale as any),
+      story: t('context_current2_story', locale as any),
       color: 'text-earth-brown-600'
     },
     {
       icon: Heart,
-      title: 'Families Still Connected',
+      title: t('context_current3_title', locale as any),
       value: '42%',
-      description: 'Households still farming in peri-urban areas',
-      story: 'These families hold the wisdom and traditions we need to preserve',
+      description: t('context_current3_desc', locale as any),
+      story: t('context_current3_story', locale as any),
       color: 'text-valley-blue-600'
     },
     {
       icon: Sprout,
-      title: 'Small Plots, Big Dreams',
+      title: t('context_current4_title', locale as any),
       value: '0.27 ha',
-      description: 'Average family plot size (≈5¼ ropani)',
-      story: 'Perfect size to start your journey - not too big, not too small',
+      description: t('context_current4_desc', locale as any),
+      story: t('context_current4_story', locale as any),
       color: 'text-farm-green-600'
     }
   ]
 
   const opportunities = [
     {
-      title: 'People Want Real Food',
-      description: 'Growing demand for organic, locally-grown food',
+      title: t('context_opp1_title', locale as any),
+      description: t('context_opp1_desc', locale as any),
       icon: '🌱'
     },
     {
-      title: 'Land is Available',
-      description: 'Idle plots waiting for passionate farmers',
+      title: t('context_opp2_title', locale as any),
+      description: t('context_opp2_desc', locale as any),
       icon: '🏔️'
     },
     {
-      title: 'Community is Growing',
-      description: 'Young people choosing sustainable living',
+      title: t('context_opp3_title', locale as any),
+      description: t('context_opp3_desc', locale as any),
       icon: '🤝'
     },
     {
-      title: 'Knowledge is Here',
-      description: 'Traditional farming wisdom combined with modern organic techniques',
+      title: t('context_opp4_title', locale as any),
+      description: t('context_opp4_desc', locale as any),
       icon: '📚'
     }
   ]
@@ -73,10 +78,10 @@ const ContextSection = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            The Story of Our Land
+            {t('context_title', locale as any)}
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Generations of farmers. Fresh eyes. New chapter.
+            {t('context_subtitle', locale as any)}
           </p>
         </motion.div>
 
@@ -119,11 +124,10 @@ const ContextSection = () => {
           className="bg-white rounded-2xl p-8 lg:p-12 shadow-lg"
         >
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-8">
-            The Time is Now
+            {t('context_time_now_title', locale as any)}
           </h3>
           <p className="text-center text-gray-600 mb-8 max-w-3xl mx-auto">
-            Everything is aligning for young people who want to live differently. 
-            The land is calling, the community is ready, and the world needs what we can grow.
+            {t('context_time_now_desc', locale as any)}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {opportunities.map((opportunity, index) => (
@@ -159,14 +163,13 @@ const ContextSection = () => {
         >
           <div className="bg-gradient-to-r from-farm-green-600 to-valley-blue-600 rounded-2xl p-8 lg:p-12 text-white">
             <h3 className="text-3xl font-bold mb-4">
-              Will You Answer the Call?
+              {t('context_cta_title', locale as any)}
             </h3>
             <p className="text-xl mb-8 text-green-100">
-              The land is waiting for someone who will love it, care for it, and grow with it. 
-              That someone could be you.
+              {t('context_cta_desc', locale as any)}
             </p>
             <button className="bg-white text-farm-green-600 hover:bg-gray-50 font-semibold py-3 px-8 rounded-lg transition-colors duration-200">
-              Explore Your Options
+              {t('context_cta_button', locale as any)}
             </button>
           </div>
         </motion.div>

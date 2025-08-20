@@ -3,64 +3,68 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Check, X, Heart, Users, Home, Sprout, Leaf } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { t } from '@/lib/intl'
 
 const LeaseModels = () => {
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const pathname = usePathname()
+  const locale = pathname.startsWith('/ne') ? 'ne' : 'en'
 
   const paths = [
     {
       id: 'simple-lease',
-      name: 'Simple Land Lease',
+      name: t('lease_simple_name', locale as any),
       icon: Heart,
-      description: 'Rent a plot and keep everything you grow',
-      bestFor: 'Start simple, learn as you go',
-      keyConsideration: 'Make sure you have a 5-year renewal option',
-      pros: ['Start with minimal commitment', 'Keep all your harvest', 'Simple and straightforward'],
-      cons: ['Higher upfront costs', 'All responsibility is yours', 'No shared benefits'],
+      description: t('lease_simple_desc', locale as any),
+      bestFor: t('lease_simple_best', locale as any),
+      keyConsideration: t('lease_simple_consider', locale as any),
+      pros: [t('lease_simple_pro1', locale as any), t('lease_simple_pro2', locale as any), t('lease_simple_pro3', locale as any)],
+      cons: [t('lease_simple_con1', locale as any), t('lease_simple_con2', locale as any), t('lease_simple_con3', locale as any)],
       color: 'border-farm-green-500'
     },
     {
       id: 'shared-harvest',
-      name: 'Shared Harvest (Bataiya)',
+      name: t('lease_shared_name', locale as any),
       icon: Users,
-      description: 'Split your harvest with the landowner (usually 50:50)',
-      bestFor: 'Start with less money, share the journey',
-      keyConsideration: 'Be clear about who pays for what',
-      pros: ['Lower upfront costs', 'Shared risk and reward', 'Traditional approach'],
-      cons: ['Share your harvest', 'More complex arrangements', 'Potential disagreements'],
+      description: t('lease_shared_desc', locale as any),
+      bestFor: t('lease_shared_best', locale as any),
+      keyConsideration: t('lease_shared_consider', locale as any),
+      pros: [t('lease_shared_pro1', locale as any), t('lease_shared_pro2', locale as any), t('lease_shared_pro3', locale as any)],
+      cons: [t('lease_shared_con1', locale as any), t('lease_shared_con2', locale as any), t('lease_shared_con3', locale as any)],
       color: 'border-valley-blue-500'
     },
     {
       id: 'lease-to-own',
-      name: 'Lease with Future Ownership',
+      name: t('lease_own_name', locale as any),
       icon: Home,
-      description: 'Part of your rent goes toward eventually buying the land',
-      bestFor: 'Test before buying, build equity',
-      keyConsideration: 'Understand the tax implications',
-      pros: ['Path to permanent home', 'Test before buying', 'Build equity over time'],
-      cons: ['More complex structure', 'Higher total cost', 'Legal complexity'],
+      description: t('lease_own_desc', locale as any),
+      bestFor: t('lease_own_best', locale as any),
+      keyConsideration: t('lease_own_consider', locale as any),
+      pros: [t('lease_own_pro1', locale as any), t('lease_own_pro2', locale as any), t('lease_own_pro3', locale as any)],
+      cons: [t('lease_own_con1', locale as any), t('lease_own_con2', locale as any), t('lease_own_con3', locale as any)],
       color: 'border-earth-brown-500'
     },
     {
       id: 'community-farm',
-      name: 'Community Farm Partnership',
+      name: t('lease_comm_name', locale as any),
       icon: Sprout,
-      description: 'Join with others to farm larger areas together',
-      bestFor: 'Community-focused, shared resources',
-      keyConsideration: 'Clear communication and shared decision-making',
-      pros: ['Shared resources and knowledge', 'Stronger community presence', 'Distributed risk'],
-      cons: ['Complex coordination', 'Shared decision making', 'Potential conflicts'],
+      description: t('lease_comm_desc', locale as any),
+      bestFor: t('lease_comm_best', locale as any),
+      keyConsideration: t('lease_comm_consider', locale as any),
+      pros: [t('lease_comm_pro1', locale as any), t('lease_comm_pro2', locale as any), t('lease_comm_pro3', locale as any)],
+      cons: [t('lease_comm_con1', locale as any), t('lease_comm_con2', locale as any), t('lease_comm_con3', locale as any)],
       color: 'border-farm-green-500'
     },
     {
       id: 'learning-farm',
-      name: 'Learning Farm Program',
+      name: t('lease_learn_name', locale as any),
       icon: Leaf,
-      description: 'Work with experienced farmers to learn while you grow',
-      bestFor: 'Those who want mentorship and guidance on their journey',
-      keyConsideration: 'Find the right mentor and clear learning goals',
-      pros: ['Learn from experience', 'Reduced risk', 'Built-in support network'],
-      cons: ['Less independence', 'May take longer to learn', 'Dependent on mentor'],
+      description: t('lease_learn_desc', locale as any),
+      bestFor: t('lease_learn_best', locale as any),
+      keyConsideration: t('lease_learn_consider', locale as any),
+      pros: [t('lease_learn_pro1', locale as any), t('lease_learn_pro2', locale as any), t('lease_learn_pro3', locale as any)],
+      cons: [t('lease_learn_con1', locale as any), t('lease_learn_con2', locale as any), t('lease_learn_con3', locale as any)],
       color: 'border-valley-blue-500'
     }
   ]
@@ -77,13 +81,8 @@ const LeaseModels = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Choose Your Path
-          </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            There's no one right way to start your farming journey. Each path offers different 
-            benefits and challenges. Choose the one that feels right for your heart and your situation.
-          </p>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">{t('lease_title', locale as any)}</h2>
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">{t('lease_subtitle', locale as any)}</p>
         </motion.div>
 
         {/* Path Options */}
@@ -109,11 +108,11 @@ const LeaseModels = () => {
               <p className="text-gray-600 mb-4">{path.description}</p>
               <div className="space-y-2">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Best for:</span>
+                  <span className="text-sm font-medium text-gray-500">{t('lease_best_for_label', locale as any)}</span>
                   <p className="text-sm text-gray-700">{path.bestFor}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Consider:</span>
+                  <span className="text-sm font-medium text-gray-500">{t('lease_consider_label', locale as any)}</span>
                   <p className="text-sm text-gray-700">{path.keyConsideration}</p>
                 </div>
               </div>
@@ -132,18 +131,16 @@ const LeaseModels = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column */}
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {selectedPathData.name}
-                </h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{selectedPathData.name}</h3>
                 <p className="text-gray-600 mb-6">{selectedPathData.description}</p>
                 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Best for:</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('lease_best_for_label', locale as any)}</h4>
                     <p className="text-gray-600">{selectedPathData.bestFor}</p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Key consideration:</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('lease_consider_label', locale as any)}</h4>
                     <p className="text-gray-600">{selectedPathData.keyConsideration}</p>
                   </div>
                 </div>
@@ -152,10 +149,7 @@ const LeaseModels = () => {
               {/* Right Column */}
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                    <Check className="h-5 w-5 text-farm-green-600 mr-2" />
-                    What You'll Love
-                  </h4>
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><Check className="h-5 w-5 text-farm-green-600 mr-2" />{t('lease_love', locale as any)}</h4>
                   <ul className="space-y-2">
                     {selectedPathData.pros.map((pro, index) => (
                       <li key={index} className="flex items-start">
@@ -167,10 +161,7 @@ const LeaseModels = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                    <X className="h-5 w-5 text-red-600 mr-2" />
-                    Challenges to Consider
-                  </h4>
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center"><X className="h-5 w-5 text-red-600 mr-2" />{t('lease_challenges', locale as any)}</h4>
                   <ul className="space-y-2">
                     {selectedPathData.cons.map((con, index) => (
                       <li key={index} className="flex items-start">
