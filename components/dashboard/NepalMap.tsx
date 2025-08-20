@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 
@@ -14,8 +14,7 @@ const icon = new Icon({
   popupAnchor: [1, -34],
 });
 
-// Nepal coordinates (center of the country)
-const NEPAL_CENTER = [28.3949, 84.124];
+// Kathmandu Valley center
 const KATHMANDU_VALLEY = [27.7172, 85.324];
 
 interface Plot {
@@ -46,7 +45,7 @@ const MapComponent = dynamic(() => Promise.resolve(NepalMapComponent), {
   ),
 });
 
-function NepalMapComponent({ plots, onPlotSelect, selectedPlotId }: NepalMapProps) {
+function NepalMapComponent({ plots, onPlotSelect }: NepalMapProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
