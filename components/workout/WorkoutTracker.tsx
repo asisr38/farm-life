@@ -310,14 +310,6 @@ const WorkoutTracker: React.FC = () => {
   const exercisesDoneCount = useMemo(() => filtered.filter((r) => (progress[r.id]?.setsCompleted ?? 0) >= r.sets).length, [filtered, progress])
   const setsRemaining = Math.max(0, totalSets - completedSets)
 
-  const getNextIncompleteId = (): string | null => {
-    for (const r of filtered) {
-      const doneSets = progress[r.id]?.setsCompleted ?? 0
-      if (doneSets < r.sets) return r.id
-    }
-    return null
-  }
-
   const scrollToExercise = (rowId: string) => {
     try {
       const el = document.getElementById(`ex-${rowId}`)
@@ -326,10 +318,12 @@ const WorkoutTracker: React.FC = () => {
   }
 
   const nextRow = useMemo(() => {
-    const id = getNextIncompleteId()
-    if (!id) return null
-    return filtered.find((r) => r.id === id) || null
-  }, [filtered, progress, getNextIncompleteId])
+    for (const r of filtered) {
+      const doneSets = progress[r.id]?.setsCompleted ?? 0
+      if (doneSets < r.sets) return r
+    }
+    return null
+  }, [filtered, progress])
 
   const saveSession = (next: SessionState | null) => {
     setSession(next)
@@ -494,8 +488,14 @@ const WorkoutTracker: React.FC = () => {
     } catch {}
     // Scroll to next incomplete after state updates flush
     setTimeout(() => {
-      const nextId = getNextIncompleteId()
-      if (nextId && nextId !== row.id) scrollToExercise(nextId)
+      const id = (() => {
+        for (const r of filtered) {
+          const done = progress[r.id]?.setsCompleted ?? 0
+          if (done < r.sets) return r.id
+        }
+        return null
+      })()
+      if (id && id !== row.id) scrollToExercise(id)
     }, 160)
   }
 
