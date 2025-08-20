@@ -26,6 +26,12 @@ const STORAGE_KEY = 'workout_progress_v1'
 const SESSION_KEY = 'workout_session_v1'
 const SESSIONS_LOG_KEY = 'workout_sessions_log_v1'
 
+const DEFAULT_PLAN_PATHS = [
+  '/two_month_workout_plan_with_new_exercises.json',
+  '/two_month_workout_plan.json',
+] as const
+const ENV_PLAN_URL = process.env.NEXT_PUBLIC_WORKOUT_PLAN_URL
+
 type SessionState = {
   currentDayName: string
   accumulatedMs: number
@@ -211,15 +217,28 @@ const WorkoutTracker: React.FC = () => {
       setLoading(true)
       setPlanError('')
       try {
-        const res = await fetch('/two_month_workout_plan.json', { cache: 'no-store' })
-        if (!res.ok) throw new Error('not found')
-        const data = await res.json()
-        const rows = toWorkoutRowsFromJson(data)
-        if (rows.length === 0) throw new Error('empty')
+        const candidates = [ENV_PLAN_URL, ...DEFAULT_PLAN_PATHS].filter(Boolean) as string[]
+        let loaded = false
+        let rows: WorkoutRow[] = []
+        for (const url of candidates) {
+          try {
+            const res = await fetch(url, { cache: 'no-store' })
+            if (!res.ok) continue
+            const data = await res.json()
+            rows = toWorkoutRowsFromJson(data)
+            if (rows.length > 0) {
+              loaded = true
+              break
+            }
+          } catch {
+            // try next candidate
+          }
+        }
+        if (!loaded) throw new Error('plan_not_loaded')
         setPlan(rows)
         setSelectedDay(rows[0].day)
       } catch (err) {
-        setPlanError('Could not load JSON. Using sample plan. Place two_month_workout_plan.json in /public to load it here.')
+        setPlanError('Could not load workout plan JSON. Using sample plan. Place two_month_workout_plan_with_new_exercises.json (or two_month_workout_plan.json) in /public, or set NEXT_PUBLIC_WORKOUT_PLAN_URL to a hosted JSON.')
         setPlan(defaultPlan)
         setSelectedDay('Day 1')
       } finally {
@@ -253,25 +272,25 @@ const WorkoutTracker: React.FC = () => {
       const raw = localStorage.getItem(SESSION_KEY)
       if (raw) {
         const parsed: SessionState = JSON.parse(raw)
-        // ensure day exists
+        // ensure day exists and force paused on first load
         const dayNames = dayOrder
         const day = dayNames.includes(parsed.currentDayName) ? parsed.currentDayName : dayNames[0]
-        setSession({ ...parsed, currentDayName: day })
+        const coerced: SessionState = { ...parsed, currentDayName: day, isPaused: true, lastResumeAtMs: undefined }
+        setSession(coerced)
         setSelectedDay(day)
+        saveSession(coerced)
       } else {
-        // no session, auto-start first day
+        // no session; initialize paused by default (no auto-start)
         const firstDay = dayOrder[0]
         setSelectedDay(firstDay)
-        const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: Date.now(), isPaused: false }
+        const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: undefined, isPaused: true }
         saveSession(next)
-        requestWakeLock()
       }
     } catch {
       const firstDay = dayOrder[0]
       setSelectedDay(firstDay)
-      const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: Date.now(), isPaused: false }
+      const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: undefined, isPaused: true }
       saveSession(next)
-      requestWakeLock()
     }
   }, [plan])
 
