@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 const schema = z.object({
   email: z.string().email(),
@@ -82,10 +83,10 @@ export default function LoginPage() {
           Log In
         </Button>
         <p className="text-center text-sm">
-          No account?{' '}
-          <a href="/signup" className="font-semibold text-farm-green-600 hover:underline">
+          No account?{" "}
+          <Link href="/signup" className="font-semibold text-farm-green-600 hover:underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </form>
     </div>

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 
@@ -118,10 +119,10 @@ export default function SignUpPage() {
           Sign Up
         </Button>
         <p className="text-center text-sm">
-          Already have an account?{' '}
-          <a href="/login" className="font-semibold text-farm-green-600 hover:underline">
+          Already have an account?{" "}
+          <Link href="/login" className="font-semibold text-farm-green-600 hover:underline">
             Log in
-          </a>
+          </Link>
         </p>
       </form>
     </div>
