@@ -23,7 +23,8 @@ const FinancialCalculator = () => {
   const handleInputChange = (field: string, value: number | string) => {
     setInputs(prev => ({
       ...prev,
-      [field]: value
+      // a cleared number field parses to NaN, which would carry into every projection
+      [field]: typeof value === 'number' && Number.isNaN(value) ? 0 : value
     }))
   }
 

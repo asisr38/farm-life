@@ -36,6 +36,7 @@ type SessionState = {
   currentDayName: string
   accumulatedMs: number
   lastResumeAtMs?: number
+  startedAtMs?: number
   isPaused: boolean
 }
 
@@ -174,6 +175,7 @@ const WorkoutTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [planError, setPlanError] = useState<string>('')
   const [progress, setProgress] = useState<Record<string, ProgressEntry>>({})
+  const [progressLoaded, setProgressLoaded] = useState<boolean>(false)
   const [now, setNow] = useState<number>(Date.now())
   const [session, setSession] = useState<SessionState | null>(null)
   const [phaseOrder, setPhaseOrder] = useState<string[]>([])
@@ -202,15 +204,18 @@ const WorkoutTracker: React.FC = () => {
     } catch {
       // ignore
     }
+    setProgressLoaded(true)
   }, [])
 
   useEffect(() => {
+    // Saving before the stored progress has been read would overwrite it with the empty initial state
+    if (!progressLoaded) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
     } catch {
       // ignore
     }
-  }, [progress])
+  }, [progress, progressLoaded])
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -380,7 +385,7 @@ const WorkoutTracker: React.FC = () => {
     if (!session) return
     if (session.isPaused) {
       // resume
-      saveSession({ ...session, isPaused: false, lastResumeAtMs: Date.now() })
+      saveSession({ ...session, isPaused: false, lastResumeAtMs: Date.now(), startedAtMs: session.startedAtMs ?? Date.now() })
       requestWakeLock()
       return
     }
@@ -399,12 +404,13 @@ const WorkoutTracker: React.FC = () => {
   const handleFinishSession = () => {
     if (!session) return
     const durationMs = getSessionElapsedMs()
+    const finishedAt = Date.now()
     const logEntry = {
       day: session.currentDayName,
-      startedAt: session.lastResumeAtMs || Date.now(),
+      startedAt: session.startedAtMs ?? finishedAt - durationMs,
       durationMs,
       completedSets: { total: completedSets, outOf: totalSets },
-      finishedAt: Date.now(),
+      finishedAt,
     }
     try {
       const raw = localStorage.getItem(SESSIONS_LOG_KEY)
@@ -412,7 +418,8 @@ const WorkoutTracker: React.FC = () => {
       arr.push(logEntry)
       localStorage.setItem(SESSIONS_LOG_KEY, JSON.stringify(arr))
     } catch {}
-    saveSession(null)
+    // Leave a fresh paused session for the same day so the controls stay on screen
+    saveSession({ currentDayName: session.currentDayName, accumulatedMs: 0, lastResumeAtMs: undefined, isPaused: true })
     releaseWakeLock()
   }
 
@@ -426,7 +433,7 @@ const WorkoutTracker: React.FC = () => {
     if (atEnd) return
     const dayName = daysInPhase[currentIndex + 1]
     setSelectedDay(dayName)
-    const next: SessionState = { currentDayName: dayName, accumulatedMs: 0, lastResumeAtMs: Date.now(), isPaused: false }
+    const next: SessionState = { currentDayName: dayName, accumulatedMs: 0, lastResumeAtMs: Date.now(), startedAtMs: Date.now(), isPaused: false }
     saveSession(next)
     requestWakeLock()
   }
@@ -434,7 +441,7 @@ const WorkoutTracker: React.FC = () => {
   const handleResetPlan = () => {
     if (!confirm('Reset all workout progress and session?')) return
     setProgress({})
-    saveSession(null)
+    saveSession(days.length > 0 ? { currentDayName: days[0], accumulatedMs: 0, lastResumeAtMs: undefined, isPaused: true } : null)
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {}
@@ -468,7 +475,7 @@ const WorkoutTracker: React.FC = () => {
     const nextPhase = phaseOrder[nextIdx]
     const firstDay = (phaseToDays[nextPhase] || [])[0]
     if (!firstDay) return
-    const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: Date.now(), isPaused: false }
+    const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: Date.now(), startedAtMs: Date.now(), isPaused: false }
     setSelectedDay(firstDay)
     saveSession(next)
   }
@@ -483,7 +490,7 @@ const WorkoutTracker: React.FC = () => {
     const firstDay = (phaseToDays[phaseName] || [])[0]
     if (!firstDay) return
     setSelectedDay(firstDay)
-    const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: Date.now(), isPaused: false }
+    const next: SessionState = { currentDayName: firstDay, accumulatedMs: 0, lastResumeAtMs: Date.now(), startedAtMs: Date.now(), isPaused: false }
     saveSession(next)
   }
 
@@ -505,25 +512,21 @@ const WorkoutTracker: React.FC = () => {
         ;(navigator as any).vibrate?.(30)
       }
     } catch {}
-    // Scroll to next incomplete after state updates flush
-    setTimeout(() => {
-      const id = (() => {
-        for (const r of filtered) {
-          const done = progress[r.id]?.setsCompleted ?? 0
-          if (done < r.sets) return r.id
-        }
-        return null
-      })()
-      if (id && id !== row.id) scrollToExercise(id)
-    }, 160)
+    // `progress` still holds the count from before this click, so add the set just completed
+    const doneSets = Math.min((progress[row.id]?.setsCompleted ?? 0) + 1, row.sets)
+    if (doneSets < row.sets) return
+    // Exercise finished: scroll to the next unfinished one, falling back to any skipped earlier
+    const isUnfinished = (r: WorkoutRow) => r.id !== row.id && (progress[r.id]?.setsCompleted ?? 0) < r.sets
+    const idx = filtered.findIndex((r) => r.id === row.id)
+    const next = filtered.slice(idx + 1).find(isUnfinished) ?? filtered.find(isUnfinished)
+    if (next) setTimeout(() => scrollToExercise(next.id), 160)
   }
 
   const getRemaining = (rowId: string): number => {
     const endRaw = localStorage.getItem(`${STORAGE_KEY}_timer_${rowId}`)
     if (!endRaw) return 0
-    const remaining = Math.max(0, parseInt(endRaw, 10) - now)
-    if (remaining === 0) localStorage.removeItem(`${STORAGE_KEY}_timer_${rowId}`)
-    return remaining
+    // Finished timers are cleared by the expiry effect below, after it has played the cue
+    return Math.max(0, parseInt(endRaw, 10) - now)
   }
 
   const handleStartTimer = (row: WorkoutRow) => {
