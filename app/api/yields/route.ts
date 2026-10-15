@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getCurrentUser } from "@/lib/auth";
+import { activeLeaseWhere, canManagePlot } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -12,10 +12,10 @@ const createYieldSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const json = await request.json();
+  const json = await request.json().catch(() => null);
   const parse = createYieldSchema.safeParse(json);
   if (!parse.success) {
     return NextResponse.json({ error: { code: "INVALID_BODY", details: parse.error.flatten() } }, { status: 400 });
@@ -29,18 +29,14 @@ export async function POST(request: Request) {
     include: {
       plot: {
         include: {
-          leases: { where: { farmerId: session.user?.id } },
+          leases: { where: activeLeaseWhere(user.id) },
         },
       },
     },
   });
   if (!crop) return NextResponse.json({ message: "Crop not found" }, { status: 404 });
 
-  const allowed =
-    session.user?.role === "admin" ||
-    session.user?.id === crop.plot.ownerId ||
-    crop.plot.leases.length > 0;
-  if (!allowed) return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+  if (!canManagePlot(user, crop.plot)) return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 
   const yieldRecord = await prisma.yield.create({
     data: {

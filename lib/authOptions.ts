@@ -22,7 +22,10 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials.password) {
           return null
         }
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } })
+        // Signup stores emails lowercased; match older mixed-case accounts too
+        const user = await prisma.user.findFirst({
+          where: { email: { equals: credentials.email.trim(), mode: "insensitive" } },
+        })
         if (!user || !user.passwordHash) return null
         const isValid = await compare(credentials.password, user.passwordHash)
         if (!isValid) return null

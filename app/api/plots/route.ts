@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getCurrentUser } from "@/lib/auth";
+import { visiblePlotsWhere } from "@/lib/access";
 import { z } from "zod";
 
 const createPlotSchema = z.object({
@@ -12,33 +12,33 @@ const createPlotSchema = z.object({
 });
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  const filters: any = {};
-  if (session.user?.role === "farmer") {
-    filters.leases = { some: { farmerId: session.user.id } };
-  } else if (session.user?.role === "landowner") {
-    filters.ownerId = session.user.id;
-  }
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const plots = await prisma.plot.findMany({
-    where: filters,
+    where: visiblePlotsWhere(user),
     include: {
       crops: true,
       leases: true,
     },
   });
-  return NextResponse.json(plots);
+
+  // A tenant sees only their own lease on a plot, not the terms agreed with other farmers
+  const visible = plots.map((plot) =>
+    user.role === "admin" || plot.ownerId === user.id
+      ? plot
+      : { ...plot, leases: plot.leases.filter((lease) => lease.farmerId === user.id) },
+  );
+  return NextResponse.json(visible);
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session || !["admin", "landowner"].includes(session.user?.role ?? "")) {
+  const user = await getCurrentUser();
+  if (!user || !["admin", "landowner"].includes(user.role ?? "")) {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
-  const json = await request.json();
+  const json = await request.json().catch(() => null);
   const parse = createPlotSchema.safeParse(json);
   if (!parse.success) {
     return NextResponse.json({ error: { code: "INVALID_BODY", details: parse.error.flatten() } }, { status: 400 });
@@ -49,10 +49,10 @@ export async function POST(request: Request) {
     data: {
       name,
       sizeM2: sizeM2 ?? null,
-      ownerId: session.user!.id!,
+      ownerId: user.id,
       lat: lat ?? null,
       lng: lng ?? null,
-    } as any,
+    },
   });
 
   return NextResponse.json(plot, { status: 201 });

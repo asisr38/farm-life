@@ -1,11 +1,11 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getCurrentUser } from "@/lib/auth";
+import { visiblePlotsWhere } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function PlotsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session) {
+  const user = await getCurrentUser();
+  if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p>You must be logged in.</p>
@@ -13,15 +13,8 @@ export default async function PlotsPage() {
     );
   }
 
-  const filters: any = {};
-  if (session.user?.role === "farmer") {
-    filters.leases = { some: { farmerId: session.user.id } };
-  } else if (session.user?.role === "landowner") {
-    filters.ownerId = session.user.id;
-  }
-
   const plots = await prisma.plot.findMany({
-    where: filters,
+    where: visiblePlotsWhere(user),
     include: { crops: true },
     orderBy: { name: "asc" },
   });
@@ -30,7 +23,7 @@ export default async function PlotsPage() {
     <div className="mx-auto max-w-4xl p-6">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Plots</h1>
-        {(["admin", "landowner"] as const).includes((session.user?.role as any) ?? "") && (
+        {["admin", "landowner"].includes(user.role ?? "") && (
           <Link
             href="/plots/new"
             className="rounded-lg bg-farm-green-600 px-4 py-2 text-white hover:bg-farm-green-700"

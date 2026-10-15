@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { getCurrentUser } from "@/lib/auth";
+import { visiblePlotsWhere } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Leaf, Sprout, Wheat } from "lucide-react";
@@ -10,9 +10,9 @@ import NepalMap from "@/components/dashboard/NepalMap";
 import { format } from "date-fns";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const user = await getCurrentUser();
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-xl">You must be logged in to view this page.</p>
@@ -25,13 +25,7 @@ export default async function DashboardPage() {
 
   // Fetch plots with nested crops and yields
   const plots = await prisma.plot.findMany({
-    where: {
-      leases: {
-        some: {
-          farmerId: session.user?.id,
-        },
-      },
-    },
+    where: visiblePlotsWhere(user),
     include: {
       crops: {
         include: {

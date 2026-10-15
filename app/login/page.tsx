@@ -25,7 +25,9 @@ function LoginInner() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const requestedUrl = searchParams.get("callbackUrl");
+  // Only follow paths on this site; "//host" and "/\host" are read by browsers as other origins
+  const callbackUrl = requestedUrl && /^\/(?![/\\])/.test(requestedUrl) ? requestedUrl : "/dashboard";
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: FormData) => {
