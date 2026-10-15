@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kathmandu Valley Farm — Operator Console</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          canvas: '#f6f5f1',
+          accent: { 50:'#eef3ef',100:'#dce8df',200:'#bdd4c3',300:'#94b89f',600:'#3f6b54',700:'#33573f',800:'#284432' },
+          warn:   { 50:'#faf3e6',100:'#f3e6cb',600:'#9a6a18',700:'#7c5413' },
+          danger: { 50:'#f9ece9',100:'#f1d6d0',600:'#a8473a',700:'#88382d' },
+        },
+        boxShadow: {
+          soft: '0 1px 2px rgba(28,25,23,0.04), 0 8px 24px -12px rgba(28,25,23,0.10)',
+          pop:  '0 10px 40px -12px rgba(28,25,23,0.25)',
+        },
+        borderRadius: { xl2: '1.25rem' },
+      }
+    }
+  }
+</script>
+<style>
+  :root{ --eo: cubic-bezier(0.23,1,0.32,1); --ed: cubic-bezier(0.32,0.72,0,1); }
+  html,body{ background:#f6f5f1; }
+  body{ font-family:'Geist',system-ui,sans-serif; color:#1c1917; -webkit-font-smoothing:antialiased; }
+  .num{ font-family:'Geist Mono',ui-monospace,monospace; font-feature-settings:'tnum' 1; letter-spacing:-0.01em; }
+  .press{ transition: transform .14s var(--eo); }
+  .press:active{ transform: scale(.97); }
+  .hovlift{ transition: background-color .16s var(--eo), border-color .16s var(--eo); }
+  input[type=range]{ accent-color:#3f6b54; }
+  [data-screen]{ animation: scr .24s var(--eo); }
+  @keyframes scr{ from{opacity:0; transform:translateY(5px)} to{opacity:1; transform:none} }
+  .stagger > *{ animation: rin .30s var(--eo) both; }
+  .stagger > *:nth-child(1){animation-delay:0ms}.stagger > *:nth-child(2){animation-delay:40ms}
+  .stagger > *:nth-child(3){animation-delay:80ms}.stagger > *:nth-child(4){animation-delay:120ms}
+  .stagger > *:nth-child(5){animation-delay:160ms}.stagger > *:nth-child(n+6){animation-delay:200ms}
+  @keyframes rin{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+  #modal-card{ animation: pop .2s var(--eo); transform-origin:center; }
+  @keyframes pop{ from{opacity:0; transform:scale(.96)} to{opacity:1; transform:scale(1)} }
+  #sidebar{ transition: transform .3s var(--ed); }
+  .scrollbar-thin::-webkit-scrollbar{height:8px;width:8px}
+  .scrollbar-thin::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:9999px}
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
+  @media print{ .no-print{display:none !important} body,html{background:#fff} }
+</style>
+</head>
+<body class="bg-canvas text-stone-900">
+
+<!-- =============== SIDEBAR (desktop) / DRAWER (mobile) =============== -->
+<aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-stone-200/80 flex flex-col -translate-x-full lg:translate-x-0">
+  <div class="px-5 pt-5 pb-4 flex items-center gap-2.5">
+    <div class="h-8 w-8 rounded-lg bg-accent-600 grid place-items-center text-white shrink-0">
+      <i data-lucide="sprout" class="h-[18px] w-[18px]"></i>
+    </div>
+    <div class="leading-tight">
+      <div class="font-semibold text-[15px] tracking-tight">Valley Farm</div>
+      <div class="text-[10px] uppercase tracking-[0.14em] text-stone-400 font-medium">Operator Console</div>
+    </div>
+  </div>
+
+  <!-- role switcher -->
+  <div class="px-4 pb-3">
+    <label class="block text-[10px] uppercase tracking-[0.12em] text-stone-400 font-semibold mb-1.5 px-1">Viewing as</label>
+    <div class="relative">
+      <select id="role-switch" class="press w-full appearance-none bg-stone-50 hover:bg-stone-100 hovlift border border-stone-200 rounded-lg pl-3 pr-8 py-2 text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-300">
+        <option value="operator">Operator / Admin</option>
+        <option value="farmer">Farmer (Anita)</option>
+        <option value="landowner">Landowner (Hari)</option>
+      </select>
+      <i data-lucide="chevrons-up-down" class="h-4 w-4 text-stone-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+    </div>
+  </div>
+
+  <nav id="nav" class="flex-1 px-3 space-y-0.5 overflow-y-auto scrollbar-thin"></nav>
+
+  <div class="px-4 py-3 border-t border-stone-200/80">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center rounded-lg border border-stone-200 overflow-hidden text-xs font-semibold">
+        <button id="lang-en" class="px-2.5 py-1 bg-accent-600 text-white">EN</button>
+        <button id="lang-ne" class="px-2.5 py-1 text-stone-500 hover:bg-stone-50">ने</button>
+      </div>
+      <span class="text-[10px] text-stone-400">Prototype build</span>
+    </div>
+  </div>
+</aside>
+<div id="backdrop" class="no-print fixed inset-0 bg-stone-900/30 z-40 hidden lg:hidden"></div>
+
+<!-- =============== CONTENT =============== -->
+<div class="lg:pl-60 min-h-screen flex flex-col">
+  <!-- mobile top bar -->
+  <header class="no-print lg:hidden sticky top-0 z-30 bg-white/85 backdrop-blur border-b border-stone-200/80 flex items-center gap-3 px-4 h-14">
+    <button id="hamburger" class="press p-1.5 -ml-1 rounded-lg hover:bg-stone-100"><i data-lucide="menu" class="h-5 w-5"></i></button>
+    <div class="flex items-center gap-2">
+      <div class="h-7 w-7 rounded-lg bg-accent-600 grid place-items-center text-white"><i data-lucide="sprout" class="h-4 w-4"></i></div>
+      <span class="font-semibold tracking-tight">Valley Farm</span>
+    </div>
+  </header>
+
+  <main id="screen" class="flex-1 px-5 sm:px-8 py-7 max-w-6xl w-full mx-auto"></main>
+
+  <footer class="no-print px-8 py-6 text-center text-[11px] text-stone-400">
+    Static clickable prototype, seed data only. Maps to <span class="num">PRD.md</span> Epics A–I.
+  </footer>
+</div>
+
+<!-- =============== MODAL =============== -->
+<div id="modal" class="fixed inset-0 z-[60] hidden">
+  <div class="absolute inset-0 bg-stone-900/45 no-print" id="modal-bg"></div>
+  <div class="absolute inset-0 overflow-y-auto p-4 grid place-items-start sm:place-items-center">
+    <div id="modal-card" class="relative bg-white rounded-xl2 shadow-pop w-full max-w-xl my-6"></div>
+  </div>
+</div>
+
+<!-- =============== TOAST =============== -->
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[70] hidden no-print">
+  <div class="bg-stone-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-pop flex items-center gap-2">
+    <i data-lucide="check" class="h-4 w-4 text-accent-300"></i><span id="toast-msg"></span>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   STATE (seed data grounded in PLAN_REVIEW research; organic figures)
+   ===================================================================== */
+const STAGES = ['inquiry','vetting','draft','agreement','active'];
+const STAGE_LABEL = { inquiry:'Inquiry', vetting:'Vetting', draft:'Draft', agreement:'Agreement', active:'Active', closed:'Closed' };
+
+const db = {
+  role:'operator', route:null, activeLeaseId:null, navOpen:false,
+  users:[
+    { id:'u1', name:'Anita Shrestha',     type:'farmer',    note:'Returning NRN, former software engineer (Austin). Completed 2 seasons of market-garden training.', vetting:'approved' },
+    { id:'u2', name:'Bibek Tamang',       type:'farmer',    note:'Lalitpur resident, first-time grower. Two references submitted, verification underway.', vetting:'pending' },
+    { id:'u3', name:'Hari Bahadur Karki', type:'landowner', note:'Owns two idle plots near Godawari. Wants steady income while retaining ownership.', vetting:'approved' },
+    { id:'u4', name:'Sita Maharjan',      type:'landowner', note:'Khokana plot. Awaiting on-site water verification before listing.', vetting:'approved' },
+  ],
+  plots:[
+    { id:'p1', name:'Sundarijal Rim',  ward:'Gokarneshwar-9',  ownerId:'u3', ropani:6, water:'year_round', waterSrc:'Spring-fed channel plus a lined rain-harvest pond', marketKm:14, rate:17400, models:['cash','share'],        status:'published' },
+    { id:'p2', name:'Champi Terraces', ward:'Godawari-11',     ownerId:'u3', ropani:5, water:'seasonal',   waterSrc:'Seasonal stream and one tubewell, runs low March to May',  marketKm:18, rate:14600, models:['cash'],                status:'leased'    },
+    { id:'p3', name:'Khokana Field',   ward:'Karyabinayak-3',  ownerId:'u4', ropani:8, water:'unverified', waterSrc:'Deep tubewell claimed by owner, not yet verified on site',  marketKm:9,  rate:21800, models:['cash','lease_to_own'], status:'draft'     },
+  ],
+  leases:[
+    { id:'L-001', plotId:'p2', farmerId:'u1', model:'cash', stage:'active', start:'2025-06-01', end:'2030-05-31', rentYr:73000, fee:7300,
+      crops:[ {name:'Tomato', variety:'Srijana, tunnel-grown', planted:'2025-06-15'}, {name:'Cauliflower', variety:'Snow Crown', planted:'2025-07-10'} ],
+      yields:[ {date:'2025-08',kg:184,npr:22080},{date:'2025-09',kg:327,npr:42510},{date:'2025-10',kg:413,npr:49560},{date:'2025-11',kg:286,npr:37180},{date:'2025-12',kg:152,npr:19760} ],
+      ledger:[ {date:'2025-05-28',type:'Facilitation fee',amt:-7300,method:'eSewa, off-platform',ref:'FEE-001',dir:'platform'},
+               {date:'2025-06-01',type:'Rent, Year 1 (first half)',amt:36500,method:'Bank transfer',ref:'RNT-1A',dir:'landowner'},
+               {date:'2025-12-01',type:'Rent, Year 1 (second half)',amt:36500,method:'Bank transfer',ref:'RNT-1B',dir:'landowner'} ] },
+    { id:'L-002', plotId:'p1', farmerId:'u2', model:'cash', stage:'vetting', start:'2026-06-01', end:'2031-05-31', rentYr:104400, fee:10440, crops:[], yields:[], ledger:[] },
+    { id:'L-003', plotId:'p1', farmerId:'u1', model:'share', stage:'inquiry', start:'', end:'', rentYr:0, fee:0, crops:[], yields:[], ledger:[] },
+  ],
+};
+const user=id=>db.users.find(u=>u.id===id)||{name:'—'};
+const plot=id=>db.plots.find(p=>p.id===id)||{name:'—'};
+const lease=id=>db.leases.find(l=>l.id===id);
+const npr=n=>'Rs '+Number(n||0).toLocaleString('en-IN');
+const lakh=n=>(n/100000).toFixed(1)+'L';
+
+/* =====================================================================
+   NAV
+   ===================================================================== */
+const NAV={
+  operator:[ {id:'queue',label:'Pipeline',icon:'columns-3'},{id:'plots',label:'Plots',icon:'map-pin'},{id:'people',label:'People',icon:'user-round-check'},{id:'ledger',label:'Ledger',icon:'receipt-text'},{id:'resources',label:'Resources',icon:'book-marked'} ],
+  farmer:[ {id:'browse',label:'Find land',icon:'search'},{id:'fdash',label:'My farm',icon:'layout-grid'},{id:'calc',label:'Planner',icon:'sliders-horizontal'},{id:'journey',label:'My journey',icon:'flag'},{id:'resources',label:'Resources',icon:'book-marked'} ],
+  landowner:[ {id:'ldash',label:'My land',icon:'layout-grid'},{id:'lleases',label:'Income',icon:'receipt-text'},{id:'resources',label:'Resources',icon:'book-marked'} ],
+};
+
+/* =====================================================================
+   UI HELPERS
+   ===================================================================== */
+function tag(text,tone,icon){
+  const t={ accent:'bg-accent-50 text-accent-700 ring-accent-100', warn:'bg-warn-50 text-warn-700 ring-warn-100', danger:'bg-danger-50 text-danger-700 ring-danger-100', neutral:'bg-stone-100 text-stone-600 ring-stone-200' }[tone||'neutral'];
+  const ic=icon?`<i data-lucide="${icon}" class="h-3 w-3"></i>`:'';
+  return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold ring-1 ring-inset ${t}">${ic}${text}</span>`;
+}
+function water(w){ return w==='year_round'?tag('Year-round','accent','droplet'):w==='seasonal'?tag('Seasonal','warn','droplet'):tag('Unverified','danger','triangle-alert'); }
+function plotStatus(s){ return {published:tag('Available','neutral'),draft:tag('Draft','warn'),leased:tag('Leased','accent'),retired:tag('Retired','neutral')}[s]||''; }
+function avatar(name,size){
+  const init=name.split(' ').map(w=>w[0]).slice(0,2).join('');
+  const tints=['bg-accent-100 text-accent-700','bg-warn-100 text-warn-700','bg-stone-200 text-stone-700','bg-danger-100 text-danger-700'];
+  const t=tints[(name.charCodeAt(0)+name.length)%tints.length];
+  const s=size||'h-9 w-9 text-[12px]';
+  return `<span class="num ${s} ${t} rounded-full grid place-items-center font-semibold shrink-0">${init}</span>`;
+}
+function btn(label,action,tone='primary',icon=''){
+  const t={ primary:'bg-accent-600 hover:bg-accent-700 text-white', ghost:'bg-white border border-stone-200 hover:bg-stone-50 text-stone-700', danger:'bg-danger-600 hover:bg-danger-700 text-white', subtle:'bg-stone-100 hover:bg-stone-200 text-stone-700' }[tone];
+  const ic=icon?`<i data-lucide="${icon}" class="h-4 w-4"></i>`:'';
+  return `<button data-action="${action}" class="press hovlift inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold ${t}">${ic}${label}</button>`;
+}
+function pageHead(title,sub,action){
+  return `<div class="flex flex-wrap items-end justify-between gap-3 mb-6">
+    <div><h1 class="text-[22px] font-semibold tracking-tight">${title}</h1><p class="text-sm text-stone-500 mt-0.5 max-w-xl">${sub}</p></div>
+    ${action||''}</div>`;
+}
+function statStrip(items){
+  return `<div class="flex flex-wrap divide-x divide-stone-200 border-y border-stone-200 mb-7">
+    ${items.map(s=>`<div class="px-5 py-3 first:pl-0">
+      <div class="text-[11px] uppercase tracking-wide text-stone-400 font-semibold">${s.l}</div>
+      <div class="num text-xl font-semibold mt-0.5 ${s.tone==='accent'?'text-accent-700':'text-stone-900'}">${s.v}</div>
+    </div>`).join('')}</div>`;
+}
+function panel(inner,pad='p-6'){ return `<div class="bg-white border border-stone-200 rounded-xl2 shadow-soft ${pad}">${inner}</div>`; }
+function note(tone,icon,title,body){
+  const t={warn:'bg-warn-50 border-warn-100 text-warn-700',danger:'bg-danger-50 border-danger-100 text-danger-700',accent:'bg-accent-50 border-accent-100 text-accent-700',info:'bg-stone-50 border-stone-200 text-stone-600'}[tone];
+  return `<div class="rounded-lg border ${t} p-3 flex gap-2.5 text-sm"><i data-lucide="${icon}" class="h-4 w-4 mt-0.5 shrink-0"></i><div>${title?`<b>${title}</b> `:''}${body}</div></div>`;
+}
+function toast(m){ document.getElementById('toast-msg').textContent=m; const t=document.getElementById('toast'); t.classList.remove('hidden'); lucide.createIcons(); clearTimeout(window.__t); window.__t=setTimeout(()=>t.classList.add('hidden'),2400); }
+function openModal(h){ document.getElementById('modal-card').innerHTML=h; document.getElementById('modal').classList.remove('hidden'); lucide.createIcons(); }
+function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
+
+/* =====================================================================
+   SIDEBAR / SHELL
+   ===================================================================== */
+function renderNav(){
+  const tabs=NAV[db.role];
+  if(!db.route||!tabs.find(t=>t.id===db.route)&&db.route!=='leasework') db.route=tabs[0].id;
+  document.getElementById('nav').innerHTML=tabs.map(t=>{
+    const active=t.id===db.route||(db.route==='leasework'&&t.id==='queue');
+    return `<button data-tab="${t.id}" class="press w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium hovlift
+      ${active?'bg-accent-50 text-accent-700':'text-stone-600 hover:bg-stone-100'}">
+      <i data-lucide="${t.icon}" class="h-[18px] w-[18px] ${active?'text-accent-600':'text-stone-400'}"></i>${t.label}</button>`;
+  }).join('');
+  document.getElementById('role-switch').value=db.role;
+}
+function setDrawer(open){ db.navOpen=open; const sb=document.getElementById('sidebar'),bd=document.getElementById('backdrop');
+  if(open){ sb.classList.remove('-translate-x-full'); bd.classList.remove('hidden'); } else { sb.classList.add('-translate-x-full'); bd.classList.add('hidden'); } }
+
+function render(){
+  renderNav();
+  const screens={ queue:screenQueue,plots:screenPlots,people:screenPeople,ledger:screenLedger,resources:screenResources,
+    browse:screenBrowse,fdash:screenFarmerDash,calc:screenCalc,journey:screenJourney,
+    ldash:screenLandownerDash,lleases:screenLandownerLeases,leasework:screenLeaseWork };
+  document.getElementById('screen').innerHTML=(screens[db.route]||(()=>'<p>Not found</p>'))();
+  lucide.createIcons();
+  if(db.route==='calc') wireCalc();
+}
+
+/* =====================================================================
+   OPERATOR: PIPELINE (kanban)
+   ===================================================================== */
+function screenQueue(){
+  const cols=STAGES.map(stage=>{
+    const items=db.leases.filter(l=>l.stage===stage);
+    const cards=items.map(l=>{ const p=plot(l.plotId),f=user(l.farmerId);
+      return `<button data-open="${l.id}" class="press hovlift text-left w-full bg-white rounded-xl border border-stone-200 hover:border-accent-300 p-3 shadow-soft">
+        <div class="flex items-center justify-between"><span class="num text-[11px] text-stone-400">${l.id}</span>${water(p.water)}</div>
+        <div class="font-semibold text-sm mt-1.5">${p.name}</div>
+        <div class="flex items-center gap-2 mt-2">${avatar(f.name,'h-6 w-6 text-[10px]')}<span class="text-xs text-stone-500">${f.name}</span></div>
+        <div class="num text-[11px] text-stone-400 mt-2">${p.ropani} ropani · ${l.model.replace('_',' ')}</div>
+      </button>`; }).join('')||`<div class="text-xs text-stone-300 italic px-1 py-8 text-center">empty</div>`;
+    return `<div class="min-w-[210px] flex-1">
+      <div class="flex items-center justify-between mb-2 px-0.5"><span class="text-[11px] font-semibold uppercase tracking-wide text-stone-400">${STAGE_LABEL[stage]}</span><span class="num text-[11px] text-stone-400">${items.length}</span></div>
+      <div class="space-y-2 stagger">${cards}</div></div>`;
+  }).join('');
+  return `${pageHead('Pipeline','Move each opportunity along the lease lifecycle. Open any card to work it.',btn('New listing','newplot','ghost','plus'))}
+    <div class="flex gap-3 overflow-x-auto scrollbar-thin pb-2 -mx-1 px-1">${cols}</div>
+    <p class="mt-5 text-xs text-stone-400 flex items-center gap-1.5"><i data-lucide="git-branch" class="h-3.5 w-3.5"></i>Lifecycle: Inquiry, Vetting, Draft, Agreement, Active. Every transition is audit-logged.</p>`;
+}
+
+/* =====================================================================
+   OPERATOR: LEASE WORKSPACE
+   ===================================================================== */
+function openLease(id){ db.activeLeaseId=id; db.route='leasework'; render(); }
+function stepper(stage){
+  const idx=STAGES.indexOf(stage);
+  return `<div class="flex items-center mb-6">${STAGES.map((s,i)=>{
+    const done=i<idx,cur=i===idx;
+    const dot=done?'bg-accent-600 text-white':cur?'bg-white border-2 border-accent-600 text-accent-700':'bg-white border-2 border-stone-200 text-stone-300';
+    const line=i<STAGES.length-1?`<div class="flex-1 h-[2px] mx-1.5 ${i<idx?'bg-accent-600':'bg-stone-200'}"></div>`:'';
+    return `<div class="flex items-center ${i<STAGES.length-1?'flex-1':''}">
+      <div class="flex flex-col items-center"><div class="num h-8 w-8 rounded-full grid place-items-center text-xs font-semibold ${dot}">${done?'<i data-lucide=\"check\" class=\"h-4 w-4\"></i>':i+1}</div>
+      <div class="text-[10px] mt-1 font-semibold ${cur?'text-accent-700':done?'text-stone-500':'text-stone-300'}">${STAGE_LABEL[s]}</div></div>${line}</div>`;
+  }).join('')}</div>`;
+}
+function screenLeaseWork(){
+  const l=lease(db.activeLeaseId); if(!l) return screenQueue();
+  const p=plot(l.plotId),f=user(l.farmerId),o=user(p.ownerId); let body='';
+  if(l.stage==='inquiry'){
+    body=`<p class="text-sm text-stone-600">${f.name} expressed interest in <b>${p.name}</b> on a ${l.model.replace('_',' ')} basis. Confirm the inquiry is genuine, then move both parties into vetting.</p>
+      <div class="mt-4">${btn('Start vetting','advance:vetting','primary','user-round-check')}</div>`;
+  } else if(l.stage==='vetting'){
+    const ready=f.vetting==='approved'&&o.vetting==='approved'&&p.water!=='unverified';
+    body=`<div class="space-y-3">${vetRow(f,'Farmer')}${vetRow(o,'Landowner')}
+      ${p.water==='unverified'?note('danger','triangle-alert','Blocked:','dry-season water is unverified for this plot. Leases cannot proceed until water is verified or seasonal limits are clearly disclosed.'):''}
+      <div class="flex flex-wrap gap-2 pt-1">
+        ${ready?btn('Both vetted, draft lease','advance:draft','primary','file-pen-line'):`<button disabled class="rounded-lg px-3.5 py-2 text-sm font-semibold bg-stone-100 text-stone-400 cursor-not-allowed">Approve both parties to continue</button>`}
+        ${f.vetting!=='approved'?btn('Approve farmer','approve:'+f.id,'ghost','check'):''}
+        ${o.vetting!=='approved'?btn('Approve landowner','approve:'+o.id,'ghost','check'):''}
+      </div></div>`;
+  } else if(l.stage==='draft'){
+    body=`<p class="text-sm text-stone-600 mb-4">Structured terms map directly to clauses in the generated agreement.</p>
+      <div class="border border-stone-200 rounded-xl divide-y divide-stone-100">
+        ${dl('Model',l.model.replace('_',' '))}${dl('Term','5 + 5 years, auto-renews unless 12-month notice')}
+        ${dl('Annual rent',npr(l.rentYr)+' · '+p.ropani+' ropani at '+npr(p.rate))}${dl('Facilitation fee',npr(l.fee)+' (10% of Year-1 rent, placeholder)')}
+        ${dl('Water guarantee',p.water==='year_round'?'Year-round; rebate if pump runs under 4 hr/day':'Seasonal disclosed; drought rebate March to May')}
+        ${dl('Dispute path','Mediation via Bagmati Province board before courts')}</div>
+      <div class="mt-4">${note('info','list-checks','Clauses included:','tenure security, right of first refusal, improvements ownership, water guarantee, dispute resolution.')}</div>
+      <div class="mt-4">${btn('Generate agreement (EN / ने)','genagreement','primary','file-text')}</div>`;
+  } else if(l.stage==='agreement'){
+    body=`${note('accent','file-check','Agreement generated.','Parties sign offline and register at the Ward Office, then the scan is uploaded here.')}
+      <div class="mt-3">${btn('View / print agreement','genagreement','ghost','printer')}</div>
+      <button data-action="advance:active" class="press hovlift mt-4 w-full border-2 border-dashed border-stone-300 hover:border-accent-300 rounded-xl p-6 text-center text-sm text-stone-500">
+        <i data-lucide="upload" class="h-6 w-6 mx-auto mb-2 text-stone-400"></i>Drop signed, ward-registered agreement<br><span class="text-xs text-stone-400">prototype: click to simulate upload and activate</span></button>`;
+  } else if(l.stage==='active'){
+    body=`${note('accent','circle-check','Lease active.','The farmer dashboard is live and money events post to the ledger.')}
+      ${statStrip([{l:'Annual rent',v:npr(l.rentYr),tone:'accent'},{l:'Facilitation fee',v:npr(l.fee)},{l:'Crops tracked',v:l.crops.length}])}
+      ${btn('Open ledger','goledger','ghost','receipt-text')}`;
+  }
+  return `<button data-tab="queue" class="press text-sm text-stone-500 hover:text-stone-800 flex items-center gap-1 mb-4"><i data-lucide="arrow-left" class="h-4 w-4"></i>Pipeline</button>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div><div class="flex items-center gap-2.5"><h1 class="text-[22px] font-semibold tracking-tight">${p.name}</h1>${water(p.water)}</div>
+      <p class="text-sm text-stone-500 mt-0.5"><span class="num">${l.id}</span> · ${f.name} and ${o.name} · ${p.ward}</p></div>
+      ${tag(STAGE_LABEL[l.stage],l.stage==='active'?'accent':'warn')}</div>
+    ${panel(stepper(l.stage)+`<div class="border-t border-stone-100 pt-5">${body}</div>`)}`;
+}
+function dl(k,v){ return `<div class="flex items-center justify-between gap-4 px-4 py-2.5"><span class="text-xs font-medium text-stone-400">${k}</span><span class="text-sm font-medium text-right ${k==='Annual rent'?'num':''}">${v}</span></div>`; }
+function vetRow(u,role){ const ok=u.vetting==='approved';
+  return `<div class="flex items-start justify-between gap-3 rounded-xl border border-stone-200 p-3">
+    <div class="flex gap-3">${avatar(u.name)}<div><div class="font-semibold text-sm">${u.name} <span class="text-stone-400 font-normal">· ${role}</span></div><div class="text-xs text-stone-500 max-w-md mt-0.5">${u.note}</div></div></div>
+    ${ok?tag('Vetted','accent','check'):tag('Pending','warn')}</div>`;
+}
+function agreementModal(l){ const p=plot(l.plotId),f=user(l.farmerId),o=user(p.ownerId);
+  return `<div class="p-6">
+    <div class="flex items-center justify-between no-print mb-4"><h3 class="font-semibold text-lg flex items-center gap-2"><i data-lucide="file-text" class="h-5 w-5 text-accent-600"></i>Lease Agreement</h3>
+    <button data-action="closemodal" class="press text-stone-400 hover:text-stone-700"><i data-lucide="x" class="h-5 w-5"></i></button></div>
+    <div class="border border-stone-200 rounded-xl p-5 text-sm leading-relaxed max-h-[58vh] overflow-y-auto scrollbar-thin">
+      <div class="text-center mb-3"><div class="font-semibold tracking-tight">AGRICULTURAL LAND LEASE AGREEMENT</div><div class="num text-xs text-stone-400">कृषि भूमि भाडा सम्झौता · ${l.id}</div></div>
+      <p>This 5 + 5 year lease is made between <b>${o.name}</b> (Landowner) and <b>${f.name}</b> (Farmer) for <b>${p.name}</b>, ${p.ward}, measuring ${p.ropani} ropani.</p>
+      <ol class="list-decimal ml-5 mt-2 space-y-1 marker:text-stone-400">
+        <li><b>Rent:</b> ${npr(l.rentYr)} per year (${npr(p.rate)} per ropani), paid in two installments.</li>
+        <li><b>Tenure:</b> 5 years plus automatic 5-year extension unless 12-month written notice.</li>
+        <li><b>Right of first refusal:</b> Farmer may match any third-party purchase offer.</li>
+        <li><b>Improvements:</b> tunnels, pack-house and solar remain the Farmer's or are compensated at residual value.</li>
+        <li><b>Water guarantee:</b> ${p.waterSrc}. ${p.water==='seasonal'?'Drought clause March to May triggers a proportional rent rebate.':'Minimum pump availability guaranteed, rebate if unmet.'}</li>
+        <li><b>Dispute resolution:</b> mediation via the Bagmati Province board before any court action.</li>
+        <li><b>Facilitation fee:</b> ${npr(l.fee)}, one time.</li>
+      </ol>
+      <div class="grid grid-cols-2 gap-6 mt-6 pt-4 border-t border-stone-200 text-xs">
+        <div>______________________<br>Landowner · ${o.name}</div><div>______________________<br>Farmer · ${f.name}</div></div>
+      <p class="text-[11px] text-stone-400 mt-4">Registered at the Ward Office. Bilingual copy auto-generated. Lawyer-reviewed template, Operational story O2.</p></div>
+    <div class="flex gap-2 justify-end mt-4 no-print">${btn('Print','printdoc','ghost','printer')}${l.stage==='draft'?btn('Looks good, mark generated','advance:agreement','primary','check'):btn('Close','closemodal','primary','check')}</div></div>`;
+}
+
+/* =====================================================================
+   OPERATOR: PLOTS
+   ===================================================================== */
+function screenPlots(){
+  const rows=db.plots.map(p=>{ const o=user(p.ownerId);
+    return `<div class="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3.5">
+      <div class="flex items-center gap-3 min-w-[190px] flex-1">
+        <span class="h-9 w-9 rounded-lg bg-accent-50 grid place-items-center text-accent-600 shrink-0"><i data-lucide="map-pin" class="h-[18px] w-[18px]"></i></span>
+        <div><div class="font-semibold text-sm">${p.name}</div><div class="text-xs text-stone-400">${p.ward} · ${o.name}</div></div></div>
+      <div class="num text-xs text-stone-500 w-16">${p.ropani} rop</div>
+      <div class="num text-xs text-stone-500 w-24">${npr(p.rate)}</div>
+      <div class="num text-xs text-stone-500 w-16">${p.marketKm} km</div>
+      ${water(p.water)}${plotStatus(p.status)}
+      ${p.status==='draft'?btn('Verify water','verifywater:'+p.id,'ghost','badge-check'):''}</div>`;
+  }).join('');
+  return `${pageHead('Plots','Water access is a required, verified field. A plot cannot be published until water is confirmed.',btn('Add plot','newplot','primary','plus'))}
+    <div class="bg-white border border-stone-200 rounded-xl2 shadow-soft divide-y divide-stone-100 stagger">${rows}</div>`;
+}
+
+/* =====================================================================
+   OPERATOR: PEOPLE
+   ===================================================================== */
+function screenPeople(){
+  const rows=db.users.map(u=>`<div class="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3.5">
+    <div class="flex items-center gap-3 min-w-[230px] flex-1">${avatar(u.name)}<div><div class="font-semibold text-sm">${u.name}</div><div class="text-xs text-stone-500 max-w-md">${u.note}</div></div></div>
+    ${tag(u.type==='farmer'?'Farmer':'Landowner',u.type==='farmer'?'accent':'neutral')}
+    ${u.vetting==='approved'?tag('Vetted','accent','check'):tag('Pending','warn')}
+    ${u.vetting!=='approved'?btn('Approve','approve:'+u.id,'ghost','check'):''}</div>`).join('');
+  return `${pageHead('People','KYC, references and proof of ownership. Both sides must be vetted before a lease is drafted.')}
+    <div class="bg-white border border-stone-200 rounded-xl2 shadow-soft divide-y divide-stone-100 stagger">${rows}</div>`;
+}
+
+/* =====================================================================
+   OPERATOR: LEDGER
+   ===================================================================== */
+function screenLedger(){
+  const blocks=db.leases.filter(l=>l.ledger.length).map(l=>{ const p=plot(l.plotId);
+    const bal=l.ledger.filter(e=>e.dir==='landowner').reduce((a,e)=>a+e.amt,0);
+    const rows=l.ledger.map(e=>`<div class="flex items-center gap-4 px-1 py-2.5 border-b border-stone-100 last:border-0">
+      <span class="num text-xs text-stone-400 w-24 shrink-0">${e.date}</span>
+      <span class="text-sm flex-1 min-w-[140px]">${e.type}</span>
+      <span class="text-xs text-stone-400 hidden sm:block w-36">${e.method}</span>
+      <span class="num text-[11px] text-stone-300 hidden sm:block w-16">${e.ref}</span>
+      <span class="num text-sm font-semibold text-right w-24 ${e.amt<0?'text-danger-600':'text-accent-700'}">${e.amt<0?'−':''}${npr(Math.abs(e.amt))}</span></div>`).join('');
+    return panel(`<div class="flex items-center justify-between mb-3"><div><div class="font-semibold">${p.name}</div><div class="num text-xs text-stone-400">${l.id} · append-only</div></div>${tag('To landowner '+npr(bal),'accent')}</div>${rows}<div class="mt-3">${btn('Log payment','logpay','ghost','plus')}</div>`);
+  }).join('');
+  return `${pageHead('Ledger','The MVP records off-platform payments so the marketplace reconciles. Khalti and eSewa integration is Phase 2.')}<div class="space-y-5 stagger">${blocks}</div>`;
+}
+
+/* =====================================================================
+   FARMER: FIND LAND  (rich rows, not identical card grid)
+   ===================================================================== */
+function screenBrowse(){
+  const rows=db.plots.filter(p=>p.status==='published').map(p=>{ const o=user(p.ownerId);
+    return `<div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
+      <div class="flex items-center gap-3 sm:w-56 shrink-0">
+        <span class="h-11 w-11 rounded-xl bg-accent-50 grid place-items-center text-accent-600 shrink-0"><i data-lucide="map-pin" class="h-5 w-5"></i></span>
+        <div><div class="font-semibold">${p.name}</div><div class="text-xs text-stone-400">${p.ward} · ${o.name}</div></div></div>
+      <div class="flex items-center gap-6 flex-1">
+        <div><div class="num text-base font-semibold">${p.ropani}</div><div class="text-[10px] uppercase tracking-wide text-stone-400">ropani</div></div>
+        <div><div class="num text-base font-semibold">${npr(p.rate)}</div><div class="text-[10px] uppercase tracking-wide text-stone-400">per ropani / yr</div></div>
+        <div><div class="num text-base font-semibold">${p.marketKm} km</div><div class="text-[10px] uppercase tracking-wide text-stone-400">to market</div></div>
+        <div class="hidden md:block">${water(p.water)}<div class="text-[11px] text-stone-400 mt-1">${p.models.map(m=>m.replace('_',' ')).join(', ')}</div></div>
+      </div>
+      <div class="sm:text-right">${btn('Express interest','interest:'+p.id,'primary','heart-handshake')}</div></div>`;
+  }).join('');
+  return `${pageHead('Find land','Only vetted, water-verified plots appear here. Expressing interest opens an inquiry in the operator pipeline.')}
+    <div class="flex flex-wrap gap-2 mb-5 text-xs">${['All plots','Year-round water','Within 15 km','Lease-to-own'].map((f,i)=>`<button class="press px-3 py-1.5 rounded-lg border ${i===0?'bg-accent-600 text-white border-accent-600':'border-stone-200 text-stone-600 hover:bg-stone-50'}">${f}</button>`).join('')}</div>
+    <div class="bg-white border border-stone-200 rounded-xl2 shadow-soft divide-y divide-stone-100 stagger">${rows}</div>`;
+}
+
+/* =====================================================================
+   FARMER: DASHBOARD
+   ===================================================================== */
+function screenFarmerDash(){
+  const l=db.leases.find(x=>x.farmerId==='u1'&&x.stage==='active');
+  if(!l) return `${pageHead('My farm','No active lease yet.')}<div class="text-center py-16">${btn('Find land','dummy','primary','search')}</div>`;
+  const p=plot(l.plotId),totKg=l.yields.reduce((a,y)=>a+y.kg,0),totNpr=l.yields.reduce((a,y)=>a+y.npr,0);
+  return `${pageHead('My farm','Champi Terraces','')}
+    ${statStrip([{l:'Plot',v:p.ropani+' rop'},{l:'Crops',v:l.crops.length},{l:'Yield to date',v:totKg+' kg',tone:'accent'},{l:'Revenue',v:npr(totNpr),tone:'accent'}])}
+    <div class="grid lg:grid-cols-3 gap-5">
+      ${panel(`<div class="font-semibold mb-1">Monthly yield</div><div class="text-xs text-stone-400 mb-3 num">kg harvested</div>${yieldChart(l.yields)}`,'p-6 lg:col-span-2')}
+      ${panel(`<div class="font-semibold mb-3">Crops</div>${l.crops.map(c=>`<div class="flex items-center justify-between py-2.5 border-b border-stone-100 last:border-0"><div><div class="text-sm font-medium">${c.name}</div><div class="text-xs text-stone-400">${c.variety}</div></div><span class="num text-xs text-stone-400">${c.planted}</span></div>`).join('')}<div class="mt-3">${btn('Log crop or yield','dummy','ghost','plus')}</div>`)}
+    </div>`;
+}
+function yieldChart(ys){
+  const max=Math.max(...ys.map(y=>y.kg)),W=480,H=170,pad=26,n=ys.length;
+  const x=i=>pad+i*((W-pad*2)/(n-1)), y=v=>H-pad-(v/max)*(H-pad*1.7);
+  const pts=ys.map((d,i)=>`${x(i)},${y(d.kg)}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44">
+    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#3f6b54" stop-opacity="0.16"/><stop offset="100%" stop-color="#3f6b54" stop-opacity="0"/></linearGradient></defs>
+    <polyline points="${x(0)},${H-pad} ${pts} ${x(n-1)},${H-pad}" fill="url(#g)" stroke="none"/>
+    <polyline points="${pts}" fill="none" stroke="#3f6b54" stroke-width="2.25" stroke-linejoin="round"/>
+    ${ys.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.kg)}" r="3.5" fill="#fff" stroke="#3f6b54" stroke-width="2"/><text x="${x(i)}" y="${H-7}" font-size="9" fill="#a8a29e" text-anchor="middle" font-family="Geist Mono">${d.date.slice(5)}</text>`).join('')}</svg>`;
+}
+
+/* =====================================================================
+   FARMER: PLANNER
+   ===================================================================== */
+function screenCalc(){
+  return `${pageHead('Honest planner','Field-validated economics, base case not best case. Land is capped at the 2025 legal ceiling of 10 ropani.')}
+    <div class="grid lg:grid-cols-2 gap-5">
+      ${panel(`<div class="space-y-6">
+        <div><div class="flex justify-between text-sm font-medium mb-1.5"><span>Land size</span><span id="c-land-l" class="num text-accent-700">5 ropani</span></div>
+          <input id="c-land" type="range" min="1" max="10" value="5" class="w-full"><div class="flex justify-between text-[10px] text-stone-400 mt-1"><span class="num">1</span><span>legal ceiling 10 ropani</span></div></div>
+        <div><div class="text-sm font-medium mb-2">Scenario</div><div class="grid grid-cols-3 gap-2" id="c-scn">
+          <button data-scn="base" class="scn press rounded-lg border-2 border-accent-600 bg-accent-50 p-2.5 text-center"><div class="text-sm font-semibold">Base</div><div class="num text-[10px] text-stone-500">~100k/rop</div></button>
+          <button data-scn="exp" class="scn press rounded-lg border border-stone-200 p-2.5 text-center"><div class="text-sm font-semibold">Expected</div><div class="num text-[10px] text-stone-500">~140k/rop</div></button>
+          <button data-scn="stretch" class="scn press rounded-lg border border-stone-200 p-2.5 text-center"><div class="text-sm font-semibold">Stretch</div><div class="num text-[10px] text-stone-500">~280k/rop</div></button></div>
+          <p class="text-[11px] text-stone-400 mt-2" id="c-scn-note"></p></div>
+        <div><div class="flex justify-between text-sm font-medium mb-1.5"><span>Lease rate per ropani / yr</span><span id="c-rate-l" class="num">15,000</span></div>
+          <input id="c-rate" type="range" min="10000" max="130000" step="500" value="15000" class="w-full"><div class="text-[10px] text-stone-400 mt-1">Documented average near 15k. Prime peri-urban land runs higher.</div></div>
+      </div>`)}
+      ${panel(`<div class="font-semibold mb-1">Three-year projection</div><div class="text-xs text-stone-400 mb-3">cumulative cash position</div>
+        <div id="c-out" class="space-y-2.5"></div>
+        ${note('warn','triangle-alert','Reality check:','most small farms run under 10% operating margin and beginning farmers work long hours for years. Secure a buyer before planting, roughly 60% of organic output never reaches an organic-priced sale.')}`)}
+    </div>`;
+}
+function wireCalc(){
+  const scn={ base:{per:100000,note:'Documented organic average for the Kathmandu Valley. Realistic for a careful first-timer.'},
+    exp:{per:140000,note:'Skilled intensive cropping with tunnels and steady market access.'},
+    stretch:{per:280000,note:'Top decile: polytunnels, multi-cropping and secured premium offtake. Not a base case, the original plan treated this as typical.'} };
+  let cur='base'; const el=id=>document.getElementById(id);
+  function calc(){ const land=+el('c-land').value,rate=+el('c-rate').value,per=scn[cur].per;
+    el('c-land-l').textContent=land+' ropani'; el('c-rate-l').textContent=rate.toLocaleString('en-IN'); el('c-scn-note').textContent=scn[cur].note;
+    const fullGross=land*per,leaseCost=land*rate,opex=land*55000,setup=land*40000;
+    const rows=[{y:'Year 1',g:fullGross*0.4,e:opex*0.6+leaseCost+setup},{y:'Year 2',g:fullGross*0.8,e:opex*0.8+leaseCost},{y:'Year 3',g:fullGross,e:opex+leaseCost}];
+    let cum=0;
+    el('c-out').innerHTML=rows.map(r=>{ const bal=r.g-r.e; cum+=bal;
+      return `<div class="rounded-lg border border-stone-200 px-3.5 py-3"><div class="flex justify-between items-center"><span class="font-medium text-sm">${r.y}</span><span class="num text-sm font-semibold ${cum>=0?'text-accent-700':'text-danger-600'}">${cum<0?'−':''}${lakh(Math.abs(cum))} cumulative</span></div>
+        <div class="num flex gap-4 text-xs text-stone-400 mt-1"><span>gross ${lakh(r.g)}</span><span>cost ${lakh(r.e)}</span><span class="${bal>=0?'text-accent-700':'text-danger-600'}">net ${bal<0?'−':''}${lakh(Math.abs(bal))}</span></div></div>`;
+    }).join('');
+  }
+  el('c-land').oninput=calc; el('c-rate').oninput=calc;
+  document.querySelectorAll('#c-scn .scn').forEach(b=>b.onclick=()=>{ cur=b.dataset.scn;
+    document.querySelectorAll('#c-scn .scn').forEach(x=>x.className='scn press rounded-lg border border-stone-200 p-2.5 text-center');
+    b.className='scn press rounded-lg border-2 border-accent-600 bg-accent-50 p-2.5 text-center'; calc(); });
+  calc();
+}
+
+/* =====================================================================
+   FARMER: JOURNEY
+   ===================================================================== */
+function screenJourney(){
+  const ph=[ {t:'Plan and learn',d:'Use the planner, study the operating playbook, choose crops and a target ward.',s:'done'},
+    {t:'Find land',d:'Browse vetted plots, shortlist by water and market distance.',s:'done'},
+    {t:'Get vetted and matched',d:'Complete KYC and references, operator pairs you with a landowner.',s:'done'},
+    {t:'Sign and register',d:'Review standardized terms, sign, register at the Ward Office.',s:'cur'},
+    {t:'Establish the farm',d:'Install drip and tunnels, secure a buyer before planting.',s:''},
+    {t:'Operate and grow',d:'Track crops and yields, renew or expand from a proven base.',s:''} ];
+  return `${pageHead('My journey','Six phases, tied to your real lease state.')}
+    <div class="relative pl-7 stagger">
+      <div class="absolute left-[11px] top-1 bottom-1 w-px bg-stone-200"></div>
+      ${ph.map((p,i)=>`<div class="relative mb-4">
+        <div class="num absolute -left-[18px] top-1 h-6 w-6 rounded-full grid place-items-center text-[11px] font-semibold ${p.s==='done'?'bg-accent-600 text-white':p.s==='cur'?'bg-white border-2 border-accent-600 text-accent-700':'bg-white border-2 border-stone-200 text-stone-300'}">${p.s==='done'?'<i data-lucide=\"check\" class=\"h-3 w-3\"></i>':i+1}</div>
+        <div class="rounded-xl border ${p.s==='cur'?'border-accent-200 bg-accent-50':'border-stone-200 bg-white'} p-4">
+          <div class="font-semibold text-sm flex items-center gap-2">${p.t} ${p.s==='cur'?tag('You are here','accent'):p.s==='done'?tag('Done','neutral'):''}</div>
+          <div class="text-sm text-stone-500 mt-0.5">${p.d}</div></div></div>`).join('')}</div>`;
+}
+
+/* =====================================================================
+   LANDOWNER
+   ===================================================================== */
+function screenLandownerDash(){
+  const mine=db.plots.filter(p=>p.ownerId==='u3');
+  const active=db.leases.filter(l=>l.stage==='active'&&mine.find(p=>p.id===l.plotId));
+  const income=active.reduce((a,l)=>a+l.ledger.filter(e=>e.dir==='landowner').reduce((s,e)=>s+e.amt,0),0);
+  return `${pageHead('My land','Owned plots, active leases and rent received.')}
+    ${statStrip([{l:'Plots owned',v:mine.length},{l:'Active leases',v:active.length},{l:'Rent received',v:npr(income),tone:'accent'}])}
+    <div class="bg-white border border-stone-200 rounded-xl2 shadow-soft divide-y divide-stone-100 stagger">
+    ${mine.map(p=>{ const l=db.leases.find(x=>x.plotId===p.id&&x.stage==='active');
+      return `<div class="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3.5">
+        <div class="flex items-center gap-3 flex-1 min-w-[180px]"><span class="h-9 w-9 rounded-lg bg-accent-50 grid place-items-center text-accent-600"><i data-lucide="map-pin" class="h-[18px] w-[18px]"></i></span>
+        <div><div class="font-semibold text-sm">${p.name}</div><div class="num text-xs text-stone-400">${p.ward} · ${p.ropani} ropani</div></div></div>
+        ${water(p.water)}${l?tag('Leased to '+user(l.farmerId).name.split(' ')[0],'accent'):plotStatus(p.status)}
+        ${l?`<span class="num text-sm font-semibold text-accent-700">${npr(l.rentYr)}/yr</span>`:''}</div>`;
+    }).join('')}</div>`;
+}
+function screenLandownerLeases(){
+  const mine=db.plots.filter(p=>p.ownerId==='u3').map(p=>p.id);
+  const active=db.leases.filter(l=>l.stage==='active'&&mine.includes(l.plotId));
+  return `${pageHead('Income','Your rent ledger, the same recorded entries the operator manages.')}<div class="space-y-5 stagger">
+    ${active.map(l=>{ const p=plot(l.plotId);
+      const rows=l.ledger.filter(e=>e.dir==='landowner').map(e=>`<div class="flex items-center justify-between py-2.5 border-b border-stone-100 last:border-0"><div><div class="text-sm font-medium">${e.type}</div><div class="num text-xs text-stone-400">${e.date} · ${e.method}</div></div><span class="num text-sm font-semibold text-accent-700">${npr(e.amt)}</span></div>`).join('');
+      return panel(`<div class="font-semibold mb-1">${p.name}</div><div class="text-xs text-stone-400 mb-2">leased to ${user(l.farmerId).name}</div>${rows}`);
+    }).join('')}</div>`;
+}
+
+/* =====================================================================
+   RESOURCES (grouped divided list, not a card grid)
+   ===================================================================== */
+function screenResources(){
+  const groups=[
+    {g:'Markets and offtake',items:[ {t:'Le Sherpa and Yellow House markets',d:'Weekend farmers markets in Lazimpat and Patan',i:'store'},{t:'KVFN farmers network',d:'Tool sharing and a marketing co-op',i:'users-round'} ]},
+    {g:'Water and inputs',items:[ {t:'Drip and solar pump subsidy',d:'Government support for groundwater and solar pumps',i:'droplet'} ]},
+    {g:'Certification and knowledge',items:[ {t:'PGS organic certification',d:'Free participatory certification training, Nepal Permaculture Group',i:'badge-check'},{t:'LI-BIRD and ICIMOD',d:'Climate-resilient vegetable manuals',i:'book-marked'} ]},
+    {g:'Legal',items:[ {t:'Bagmati Province mediation board',d:'Dispute resolution before courts',i:'scale'} ]},
+  ];
+  return `${pageHead('Resources','Bridges to the offline world: markets, water, certification and legal.')}
+    <div class="space-y-7">${groups.map(gr=>`<div>
+      <div class="text-[11px] uppercase tracking-[0.12em] text-stone-400 font-semibold mb-2 px-1">${gr.g}</div>
+      <div class="bg-white border border-stone-200 rounded-xl2 shadow-soft divide-y divide-stone-100 stagger">
+      ${gr.items.map(x=>`<div class="flex items-center gap-3.5 px-4 py-3.5"><span class="h-9 w-9 rounded-lg bg-stone-100 grid place-items-center text-stone-500 shrink-0"><i data-lucide="${x.i}" class="h-[18px] w-[18px]"></i></span>
+        <div class="flex-1"><div class="font-medium text-sm">${x.t}</div><div class="text-xs text-stone-400">${x.d}</div></div><i data-lucide="arrow-up-right" class="h-4 w-4 text-stone-300"></i></div>`).join('')}</div></div>`).join('')}</div>`;
+}
+
+/* =====================================================================
+   ADD-PLOT MODAL
+   ===================================================================== */
+function newPlotModal(){
+  openModal(`<div class="p-6">
+    <div class="flex items-center justify-between mb-5"><h3 class="font-semibold text-lg tracking-tight">Add plot</h3><button data-action="closemodal" class="press text-stone-400 hover:text-stone-700"><i data-lucide="x" class="h-5 w-5"></i></button></div>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm">${inp('Plot name','Bungmati Field')}${inp('Ward','Karyabinayak-3')}${inp('Size in ropani','5')}${inp('Asking rate per ropani','15000')}
+      <div class="sm:col-span-2 flex flex-col gap-2"><label class="text-xs font-semibold text-stone-600">Dry-season water access <span class="text-danger-600">required</span></label>
+        <select class="rounded-lg border border-stone-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-300"><option>Year-round, verified source</option><option>Seasonal, disclosed</option><option>None or unverified</option></select>
+        <p class="text-[11px] text-stone-400">A plot stays in draft until water is verified on site.</p></div></div>
+    <div class="flex justify-end gap-2 mt-6"><button data-action="closemodal" class="press rounded-lg px-3.5 py-2 text-sm font-semibold bg-white border border-stone-200">Cancel</button>${btn('Save as draft','savedraftplot','primary','save')}</div></div>`);
+}
+function inp(label,ph){ return `<div class="flex flex-col gap-1.5"><label class="text-xs font-semibold text-stone-600">${label}</label><input placeholder="${ph}" class="num rounded-lg border border-stone-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-300"></div>`; }
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+document.addEventListener('click',e=>{
+  const tab=e.target.closest('[data-tab]'); if(tab){ db.route=tab.dataset.tab; if(window.innerWidth<1024) setDrawer(false); render(); window.scrollTo(0,0); return; }
+  const open=e.target.closest('[data-open]'); if(open){ openLease(open.dataset.open); window.scrollTo(0,0); return; }
+  const a=e.target.closest('[data-action]'); if(!a) return; const act=a.dataset.action;
+  if(act==='closemodal'){ closeModal(); return; }
+  if(act==='printdoc'){ window.print(); return; }
+  if(act==='newplot'){ newPlotModal(); return; }
+  if(act==='savedraftplot'){ closeModal(); toast('Plot saved as draft, pending water verification'); return; }
+  if(act==='dummy'){ toast('Prototype: form not wired'); return; }
+  if(act==='goledger'){ db.route='ledger'; render(); window.scrollTo(0,0); return; }
+  if(act==='logpay'){ toast('Prototype: payment entry form'); return; }
+  if(act.startsWith('verifywater:')){ const p=plot(act.split(':')[1]); p.water='year_round'; p.waterSrc='Deep tubewell, verified on site'; p.status='published'; toast('Water verified, plot published'); render(); return; }
+  if(act.startsWith('approve:')){ const u=user(act.split(':')[1]); u.vetting='approved'; toast(u.name+' approved'); render(); return; }
+  if(act.startsWith('interest:')){ const pid=act.split(':')[1]; const id='L-'+String(100+db.leases.length).padStart(3,'0');
+    db.leases.push({id,plotId:pid,farmerId:'u1',model:'cash',stage:'inquiry',start:'',end:'',rentYr:0,fee:0,crops:[],yields:[],ledger:[]}); toast('Interest sent, now in the operator pipeline ('+id+')'); return; }
+  if(act==='genagreement'){ openModal(agreementModal(lease(db.activeLeaseId))); return; }
+  if(act.startsWith('advance:')){ const to=act.split(':')[1],l=lease(db.activeLeaseId);
+    if(to==='active'&&l.ledger.length===0){ l.ledger=[{date:'2026-05-29',type:'Facilitation fee',amt:-l.fee,method:'eSewa, off-platform',ref:'FEE-'+l.id,dir:'platform'},{date:'2026-06-01',type:'Rent, Year 1 (first half)',amt:Math.round(l.rentYr/2),method:'Bank transfer',ref:'RNT-'+l.id,dir:'landowner'}]; plot(l.plotId).status='leased'; }
+    l.stage=to; closeModal(); toast('Advanced to '+STAGE_LABEL[to]); render(); window.scrollTo(0,0); return; }
+});
+document.getElementById('role-switch').addEventListener('change',e=>{ db.role=e.target.value; db.route=null; if(window.innerWidth<1024) setDrawer(false); render(); window.scrollTo(0,0); });
+document.getElementById('hamburger').addEventListener('click',()=>setDrawer(!db.navOpen));
+document.getElementById('backdrop').addEventListener('click',()=>setDrawer(false));
+document.getElementById('modal-bg').addEventListener('click',closeModal);
+document.getElementById('lang-ne').addEventListener('click',()=>toast('Full EN and ने parity is a build requirement, visual only in this prototype'));
+
+render();
+lucide.createIcons();
+</script>
+</body>
+</html>

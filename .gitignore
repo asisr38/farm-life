@@ -38,9 +38,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Prisma
-/prisma/migrations/
-
 # IDE
 .vscode/
 .idea/
@@ -124,7 +121,6 @@ dist
 
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
