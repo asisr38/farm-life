@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Thaun · Land, homes and farmland in Nepal</title>
+  <meta name="description" content="Clickable prototype of Thaun, a map-first property portal for Nepal.">
+  <meta name="theme-color" content="#1f4d3a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f4d3a'/%3E%3Cpath d='M5 22l7-10 4 5 3-4 8 9' fill='none' stroke='%23f5c273' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <a class="brand" href="#/" aria-label="Thaun home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="#1f4d3a"/>
+        <path d="M5 22l7-10 4 5 3-4 8 9" fill="none" stroke="#f5c273" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M11 25.5h10" stroke="#f5f1e8" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+      </svg>
+      <span>Thaun</span><span class="brand-ne">ठाउँ</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/explore" data-nav="explore">Explore</a>
+      <a href="#/sell/1" data-nav="sell">List your land</a>
+      <a href="#/abroad" data-nav="abroad">From abroad</a>
+      <a href="#/farms" data-nav="farms">Farms</a>
+    </nav>
+    <div class="tools">
+      <select class="tool" id="currency" aria-label="Currency"></select>
+      <button class="tool" id="langBtn" aria-label="Switch language">ने</button>
+      <button class="tool hide-sm" id="themeBtn" aria-label="Theme"></button>
+      <button class="tool" id="savedBtn" aria-label="Saved shortlist"><i data-lucide="heart"></i><span class="count num" id="savedCount" hidden>0</span></button>
+      <button class="tool nav-toggle" id="menuBtn" aria-label="Menu"><i data-lucide="menu"></i></button>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile"></nav>
+
+  <main id="app"></main>
+
+  <aside class="drawer" id="drawer" aria-label="Saved shortlist">
+    <div class="drawer-head"><h2 class="display">Your shortlist</h2><button class="icon-btn" id="closeDrawer" aria-label="Close"><i data-lucide="x"></i></button></div>
+    <div class="drawer-body"></div>
+    <div class="drawer-foot">
+      <button class="btn btn-primary" id="shareList"><i data-lucide="users"></i>Share with family</button>
+      <button class="btn" id="viewSaved"><i data-lucide="map"></i>See them on the map</button>
+    </div>
+  </aside>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="prototype-ribbon" id="ribbon"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.2.0/turf.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <script src="data.js"></script>
+  <script src="geo.js"></script>
+  <script src="map.js"></script>
+  <script src="app.js"></script>
+  <script src="views-home.js"></script>
+  <script src="views-explore.js"></script>
+  <script src="views-listing.js"></script>
+  <script src="views-sell.js"></script>
+  <script src="views-pages.js"></script>
+</body>
+</html>
