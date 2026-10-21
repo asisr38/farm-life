@@ -3,7 +3,8 @@
   const G = TH.geo, M = TH.map, A = TH.app, S = TH.state;
   const STEPS = 6;
 
-  let map, step = 1, d, pinMarker, vertexMarkers = [], edgeMarkers = [], photos = [], orbit;
+  let map, step = 1, d, pinMarker, vertexMarkers = [], edgeMarkers = [], orbit;
+  const draftPhotos = () => TH.photos.owner('draft');
 
   const blank = () => ({
     intent: 'sale', type: 'land', place: null, pin: null, coords: [], closed: false, lalpurja: ['', '', '', ''],
@@ -117,6 +118,29 @@
     return `<div class="compare-result warn" id="cmpResult"><i data-lucide="triangle-alert"></i>${G.num(abs, 0)}% ${diff > 0 ? 'larger' : 'smaller'} than your lalpurja. Buyers will see the difference, so adjust the corners or upload your naksa (map sheet).</div>`;
   }
 
+  /* ---------- Photo tiles: cover, remove, and where each was taken ---------- */
+  function photoTiles() {
+    const items = draftPhotos();
+    if (!items.length) return '';
+    const parcel = d.closed && ring() ? turf.polygon([ring()]) : null;
+    return items.map((p, i) => {
+      const pl = TH.photos.placement(p, parcel, d.pin || [85.33, 27.7]);
+      const icon = { on: 'map-pin-check', near: 'map-pin', far: 'map-pin-x', none: 'map-pin-off' }[pl.state];
+      return `<figure class="ph-tile">
+          <img src="${p.thumb}" alt="Photo ${i + 1}">
+          <button class="ph-cover ${i === 0 ? 'is-on' : ''}" data-cover="${i}" aria-label="${i === 0 ? 'Cover photo' : 'Make this the cover photo'}" ${i === 0 ? 'disabled' : ''}><i data-lucide="star"></i>${i === 0 ? 'Cover' : ''}</button>
+          <button class="ph-remove" data-remove="${i}" aria-label="Remove photo ${i + 1}"><i data-lucide="x"></i></button>
+          <figcaption class="ph-gps is-${pl.state}"><i data-lucide="${icon}"></i>${pl.state === 'on' ? 'On your plot' : pl.state === 'near' ? 'Beside your plot' : pl.state === 'far' ? pl.label.replace('Taken ', '') : 'No location'}</figcaption>
+        </figure>`;
+    }).join('');
+  }
+  function renderPhotoTiles() {
+    const box = document.getElementById('photos');
+    if (!box) return;
+    box.innerHTML = photoTiles();
+    A.icons();
+  }
+
   /* ---------- Steps ---------- */
   const choice = (group, value, label, icon, sub, on) => `<button class="choice ${on ? 'is-on' : ''}" data-${group}="${value}"><i data-lucide="${icon}"></i>${label}${sub ? `<small>${sub}</small>` : ''}</button>`;
 
@@ -177,9 +201,10 @@
       case 4: return `
         <div class="eyebrow">Step 4 of ${STEPS} · Photos</div>
         <h2 class="display">Show it</h2>
-        <p>Phone photos are fine. Shoot from each corner, from the road, and the view.</p>
-        <label class="dropzone" id="drop"><i data-lucide="image-plus"></i><b>Add photos</b><span class="muted" style="font-size:13px">Drag them here or tap to choose</span><input type="file" id="files" accept="image/*" multiple hidden></label>
-        <div class="photos" id="photos">${photos.map(p => `<img src="${p}" alt="">`).join('')}</div>
+        <p>Phone photos work best. Take them standing on the land: from each corner, from the road, and of the view. If your phone saves location, buyers will see they were taken on the plot.</p>
+        <label class="dropzone" id="drop"><i data-lucide="image-plus"></i><b id="dropTitle">Add photos</b><span class="muted" style="font-size:13px" id="dropSub">Drag them here or tap to choose · up to 20</span><input type="file" id="files" accept="image/*" multiple hidden></label>
+        <div class="ph-list" id="photos">${photoTiles()}</div>
+        ${TH.photos.persistent ? '' : `<div class="callout"><i data-lucide="triangle-alert"></i><span>This browser won't let Thaun keep photos (private window?). They'll stay until you reload.</span></div>`}
         <div class="callout info"><i data-lucide="scan-search"></i><span>Thaun checks photos for duplicates and for phone numbers written on them, so buyers always come through the listing.</span></div>
         <button class="tier ${d.drone ? 'is-on' : ''}" id="drone"><i data-lucide="plane"></i><div><b>Add a drone 3D flyover</b><span>Buyers abroad can orbit your land in 3D. A pilot visits, and we turn the footage into a 3D scene.</span></div><span class="price">${d.drone ? 'Added' : 'Phase 3'}</span></button>`;
       case 5: return `
@@ -207,7 +232,7 @@
         <p>This is the card buyers will see on the map and in search.</p>
         ${l ? A.card(l) : ''}
         <div class="ledger">
-          ${[['Location pinned', !!d.pin], ['Boundary traced', d.closed], ['Price set', !!d.price], ['Photos', photos.length > 0 || d.photoCount > 0], ['Phone and consent', !!d.phone && d.consent], ['Documents for verification', d.tier === 'listed' || (d.docs.lalpurja && d.docs.id)]]
+          ${[['Location pinned', !!d.pin], ['Boundary traced', d.closed], ['Price set', !!d.price], ['Photos', draftPhotos().length > 0], ['Phone and consent', !!d.phone && d.consent], ['Documents for verification', d.tier === 'listed' || (d.docs.lalpurja && d.docs.id)]]
           .map(([n, ok]) => `<div class="ledger-row ${ok ? '' : 'is-missing'}"><i data-lucide="${ok ? 'circle-check' : 'circle-dashed'}"></i><span>${n}</span><time>${ok ? 'Done' : 'Missing'}</time></div>`).join('')}
         </div>
         <a class="btn btn-block" href="#/p/draft"><i data-lucide="eye"></i>See the full buyer view</a>`;
@@ -291,11 +316,37 @@
     }
     if (step === 4) {
       const drop = body.querySelector('#drop'), files = body.querySelector('#files');
-      const add = list => {
-        [...list].filter(f => f.type.startsWith('image/')).slice(0, 12).forEach(f => photos.push(URL.createObjectURL(f)));
-        d.photoCount = photos.length; persist();
-        body.querySelector('#photos').innerHTML = photos.map(p => `<img src="${p}" alt="">`).join('');
+      const title = body.querySelector('#dropTitle'), sub = body.querySelector('#dropSub');
+      const add = async list => {
+        const files = [...list].filter(f => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name));
+        const room = 20 - draftPhotos().length;
+        if (!files.length) return;
+        if (room <= 0) return A.toast('You can add up to 20 photos', 'images');
+        const items = [...draftPhotos()];
+        let failed = 0;
+        for (const [n, f] of files.slice(0, room).entries()) {
+          title.textContent = `Preparing ${n + 1} of ${Math.min(files.length, room)}…`;
+          try { items.push(await TH.photos.process(f)); }
+          catch { failed++; }
+        }
+        await TH.photos.save('draft', items);
+        d.photoCount = items.length; persist();
+        title.textContent = 'Add more photos';
+        sub.textContent = `${items.length} added · up to 20`;
+        renderPhotoTiles();
+        if (failed) A.toast(`${failed} ${failed === 1 ? 'photo' : 'photos'} couldn't be read. Try JPEG or PNG.`, 'image-off');
+        document.getElementById('next').disabled = !canNext();
       };
+      body.querySelector('#photos').addEventListener('click', async e => {
+        const b = e.target.closest('[data-cover], [data-remove]');
+        if (!b) return;
+        const items = [...draftPhotos()];
+        if (b.dataset.cover != null) { const [p] = items.splice(+b.dataset.cover, 1); items.unshift(p); }
+        else items.splice(+b.dataset.remove, 1);
+        await TH.photos.save('draft', items);
+        d.photoCount = items.length; persist();
+        renderPhotoTiles();
+      });
       files.addEventListener('change', () => add(files.files));
       ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
       ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('is-over'); }));
@@ -378,14 +429,14 @@
     location.hash = `#/sell/${n}`;
   }
 
-  function publish() {
+  async function publish() {
     const id = `my-${Date.now().toString(36)}`;
+    await TH.photos.move('draft', id);
     const listing = A.draftToListing(d, id);
     listing.draft = false;
     S.published = [...S.published, listing];
     A.save('published');
     S.draft = null; A.save('draft');
-    photos = [];
     A.toast('Published. Thaun will verify it within two working days.', 'rocket');
     location.hash = `#/p/${id}`;
   }
@@ -421,7 +472,7 @@
       el.querySelector('#reset').addEventListener('click', async () => {
         const v = await A.modal(`<h2 class="display">Start over?</h2><p class="muted" style="margin:0">This clears your pin, boundary and details.</p><div class="modal-actions"><button class="btn" data-v="no">Keep editing</button><button class="btn btn-primary" data-v="yes">Start over</button></div>`);
         if (v !== 'yes') return;
-        d = blank(); persist(); photos = [];
+        d = blank(); persist(); TH.photos.clear('draft');
         pinMarker && pinMarker.remove(); pinMarker = null;
         go(1); renderPanel(); setStepMap();
       });

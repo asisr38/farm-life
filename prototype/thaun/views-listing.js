@@ -5,7 +5,7 @@
   const FROZEN = ['nagarkot', 'dhulikhel', 'sundarijal']; /* illustrative subdivision-freeze status */
   const VALLEY_DISTRICTS = ['Kathmandu', 'Lalitpur', 'Bhaktapur'];
 
-  let map, orbit, l, view, io, cleanup = [];
+  let map, orbit, l, view, io, cleanup = [], photos = [], heroIdx = 0, photoPins = [];
 
   /* ---------- Sections ---------- */
   function factsHtml() {
@@ -13,7 +13,7 @@
     const fact = (icon, label, value, sub, id) => `<div class="fact"${id ? ` id="${id}"` : ''}><small><i data-lucide="${icon}"></i>${label}</small><strong class="num">${value}</strong><span>${sub || ''}</span></div>`;
     if (l.m2 && l.type !== 'flat' && l.type !== 'room') {
       const terai = false;
-      f.push(fact('square-dashed', 'Area', G.fmtRapd(l.m2), `${G.int(l.m2)} m² · ${G.int(G.sqft(l.m2))} sq ft${terai ? ' · ' + G.fmtBkd(l.m2) + ' B-K-D' : ''}`));
+      f.push(fact('square-dashed', 'Area', G.fmtRapd(l.m2), `${G.int(l.m2)}\u00a0m² · ${G.int(G.sqft(l.m2))}\u00a0sq\u00a0ft${terai ? ' · ' + G.fmtBkd(l.m2) + ' B-K-D' : ''}`));
     }
     if (l.beds) f.push(fact('bed-double', l.type === 'room' ? 'Rooms' : 'Bedrooms', l.beds, `${l.baths || 0} bath${l.floorNo ? ` · floor ${l.floorNo}` : l.floors ? ` · ${l.floors} storey` : ''}`));
     if (l.road && l.road.type) f.push(fact('route', 'Road', l.road.type === 'footpath' ? 'Footpath' : `${l.road.widthFt} ft`, l.road.type === 'blacktop' ? 'Blacktop at the gate' : l.road.toBlacktopM ? `${l.road.type === 'footpath' ? 'Footpath' : 'Gravel'}, ${l.road.toBlacktopM} m to blacktop` : ''));
@@ -88,6 +88,82 @@
     return `<section class="panel"><h2 class="display">Before you commit</h2><p class="panel-sub">Rules and risks that apply to this listing.</p>${flags.join('')}</section>`;
   }
 
+  /* ---------- Photos ---------- */
+  const hasOwnPhotos = () => photos.some(p => p.kind === 'owner');
+  const photoCtx = () => ({ parcel: l.parcel, center: l.center, onShowOnMap: showPhotoOnMap });
+
+  function photosPanel() {
+    if (!photos.length) return '';
+    const own = photos.filter(p => p.kind === 'owner');
+    const located = own.filter(p => p.gps);
+    const onPlot = located.filter(p => ['on', 'near'].includes(TH.photos.placement(p, l.parcel, l.center).state)).length;
+    let sub;
+    if (!own.length) sub = "Photos of the neighbourhood from Wikimedia Commons, not of the plot itself. The owner hasn't added photos yet.";
+    else if (!located.length) sub = `${own.length} ${own.length === 1 ? 'photo' : 'photos'} from the owner. None carry a GPS location, so Thaun can't confirm where they were taken.`;
+    else sub = `<b>${onPlot} of ${own.length}</b> owner photos were taken on or beside this plot, going by the GPS location stored in each photo.${located.length < own.length ? ` ${own.length - located.length} ${own.length - located.length === 1 ? 'has' : 'have'} no location.` : ''}`;
+    const shown = photos.slice(0, 5);
+    const more = photos.length - shown.length;
+    return `
+      <section class="panel" id="photosPanel">
+        <div class="panel-head"><div><h2 class="display">${own.length ? 'Photos' : 'Around this plot'}</h2><p class="panel-sub">${sub}</p></div>
+        <button class="chip" data-ph="0"><i data-lucide="images"></i>All ${photos.length}</button></div>
+        <div class="pgrid pgrid-${shown.length}">${shown.map((p, i) => {
+          const pl = p.kind === 'owner' ? TH.photos.placement(p, l.parcel, l.center) : null;
+          return `<button class="pgrid-tile" data-ph="${i}" aria-label="Open photo ${i + 1}${p.caption ? ': ' + A.esc(p.caption) : ''}">
+            <img src="${i === 0 ? p.src : p.thumb}" alt="" loading="lazy" decoding="async">
+            ${pl && (pl.state === 'on' || pl.state === 'near') ? '<span class="badge badge-owner pgrid-tag"><i data-lucide="map-pin"></i>On the plot</span>' : ''}
+            ${p.kind === 'area' && i === 0 ? '<span class="badge badge-glass pgrid-tag">Area photo</span>' : ''}
+            ${i === shown.length - 1 && more > 0 ? `<span class="pgrid-more">+${more} more</span>` : ''}
+          </button>`;
+        }).join('')}</div>
+      </section>`;
+  }
+
+  function setHeroMode(mode) {
+    const hp = document.getElementById('heroPhotos');
+    if (!hp) return;
+    const photosOn = mode === 'photos';
+    hp.hidden = !photosOn;
+    document.querySelector('.l-hero-controls').hidden = photosOn;
+    document.querySelectorAll('#heroMode button').forEach(b => { b.classList.toggle('is-on', b.dataset.mode === mode); b.setAttribute('aria-pressed', b.dataset.mode === mode); });
+    if (photosOn) { orbit && orbit.stop(); showHeroPhoto(heroIdx); }
+  }
+  function showHeroPhoto(k) {
+    heroIdx = (k + photos.length) % photos.length;
+    const p = photos[heroIdx];
+    const img = document.getElementById('heroImg');
+    img.src = p.src;
+    img.alt = p.caption || 'Listing photo';
+    document.getElementById('hpCap').innerHTML = `<span class="num">${heroIdx + 1} / ${photos.length}</span> ${A.esc(p.caption || (p.kind === 'owner' ? 'Photo from the owner' : ''))}${p.kind === 'area' ? ' <span class="badge badge-glass">Area photo</span>' : ''}`;
+  }
+
+  /* Thumbnail pins on the hero map for owner photos that carry a GPS position. */
+  function addPhotoPins() {
+    photoPins.forEach(m => m.remove());
+    photoPins = [];
+    if (!map) return;
+    photos.forEach((p, i) => {
+      if (p.kind !== 'owner' || !p.gps) return;
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'photo-pin';
+      el.setAttribute('aria-label', `Photo ${i + 1}, taken here`);
+      el.innerHTML = `<img src="${p.thumb}" alt="">`;
+      el.addEventListener('click', e => { e.stopPropagation(); A.lightbox(photos, i, photoCtx()); });
+      photoPins.push(new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat(p.gps).addTo(map));
+    });
+  }
+  function showPhotoOnMap(p, i) {
+    setHeroMode('map');
+    window.scrollTo({ top: 0, behavior: M.reducedMotion() ? 'auto' : 'smooth' });
+    if (!map) return;
+    orbit && orbit.stop();
+    photoPins.forEach(m => m.getElement().classList.remove('is-active'));
+    const pin = photoPins.find(m => { const ll = m.getLngLat(); return ll.lng === p.gps[0] && ll.lat === p.gps[1]; });
+    pin && pin.getElement().classList.add('is-active');
+    M.fly(map, { center: p.gps, zoom: 18.3, pitch: 45 }, { duration: 1400 });
+  }
+
   function homeHtml() {
     if (!['house', 'flat', 'room'].includes(l.type)) return '';
     const rooms = l.type === 'room' ? ['Room 1', 'Room 2', 'Kitchen', 'Bathroom', 'Entrance'] : ['Living room', 'Kitchen', 'Bedroom', 'Bathroom', 'View'];
@@ -99,10 +175,10 @@
     ].filter(Boolean);
     return `
       <section class="panel">
-        <div class="panel-head"><div><h2 class="display">Inside</h2><p class="panel-sub">Photos are added by the lister. This prototype shows placeholders.</p></div>
+        <div class="panel-head"><div><h2 class="display">Inside</h2><p class="panel-sub">${hasOwnPhotos() ? 'Room details from the lister.' : "The lister hasn't added photos of the inside yet. These tiles show what a full listing includes."}</p></div>
         <button class="chip" id="tour360"><i data-lucide="rotate-3d"></i>360° tour</button></div>
-        <div class="house-gallery">${rooms.map((r, i) => `<div style="--g1:${g[i][0]};--g2:${g[i][1]}"><i data-lucide="image"></i>${r}</div>`).join('')}</div>
-        <div class="facts" style="margin-top:16px">${details.map(([k, v]) => `<div class="fact"><small>${k}</small><strong class="num">${v}</strong></div>`).join('')}</div>
+        ${hasOwnPhotos() ? '' : `<div class="house-gallery">${rooms.map((r, i) => `<div style="--g1:${g[i][0]};--g2:${g[i][1]}"><i data-lucide="image"></i>${r}</div>`).join('')}</div>`}
+        <div class="facts" style="${hasOwnPhotos() ? '' : 'margin-top:16px'}">${details.map(([k, v]) => `<div class="fact"><small>${k}</small><strong class="num">${v}</strong></div>`).join('')}</div>
       </section>`;
   }
 
@@ -239,6 +315,7 @@
     await M.settled(map, 4000);
     if (!map) return;
     poster.classList.add('is-gone');
+    addPhotoPins();
 
     if (l.parcel) {
       const cam = map.cameraForBounds(turf.bbox(l.parcel), { padding: { top: 120, bottom: 140, left: 90, right: 90 } });
@@ -256,7 +333,8 @@
     orbit = M.orbit(map, { degPerSec: 5 });
     const ob = document.getElementById('orbitBtn');
     orbit.onchange = on => { ob.innerHTML = `<i data-lucide="${on ? 'pause' : 'play'}"></i>${on ? 'Pause' : 'Orbit'}`; A.icons(); };
-    if (M.motionOK()) orbit.start();
+    const photosShowing = document.getElementById('heroPhotos') && !document.getElementById('heroPhotos').hidden;
+    if (M.motionOK() && !photosShowing) orbit.start();
     else orbit.onchange(false);
   }
 
@@ -375,12 +453,25 @@
         return;
       }
       if (S.status == null && S.currency !== 'NPR') S.status = 'nrn';
+      photos = TH.photos.forListing(l);
+      heroIdx = 0;
       el.innerHTML = `
         ${l.draft ? `<div style="background:var(--ink);color:var(--bg);padding:10px 20px;font-weight:600;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap"><i data-lucide="eye"></i>Preview: this is how buyers will see your listing <a class="btn btn-sm btn-primary" href="#/sell/6">Back to publishing</a></div>` : ''}
         <section class="l-hero" style="view-transition-name:hero">
           <div class="map" id="lmap"></div>
           <div class="l-hero-poster" id="poster">${G.aerial(l.center, l.parcel, 1800, 900)}</div>
-          <div class="l-hero-top"><span class="badge badge-glass"><i data-lucide="satellite"></i>Satellite · 3D terrain</span>${l.parcel ? `<span class="badge badge-glass"><i data-lucide="pen-tool"></i>${l.mine ? 'Boundary traced by owner' : 'Boundary: sample shape'}</span>` : ''}</div>
+          <div class="l-hero-top">
+            ${photos.length
+              ? `<div class="seg seg-glass" id="heroMode"><button data-mode="map" aria-pressed="true" class="is-on"><i data-lucide="mountain"></i>3D plot</button><button data-mode="photos" aria-pressed="false"><i data-lucide="camera"></i>Photos · ${photos.length}</button></div>`
+              : `<span class="badge badge-glass"><i data-lucide="satellite"></i>Satellite · 3D terrain</span>`}
+            ${l.parcel ? `<span class="badge badge-glass"><i data-lucide="pen-tool"></i>${l.mine ? 'Boundary traced by owner' : 'Boundary: sample shape'}</span>` : ''}
+          </div>
+          ${photos.length ? `<div class="l-hero-photos" id="heroPhotos" hidden>
+            <img id="heroImg" alt="">
+            <button class="lb-btn hp-prev" id="hpPrev" aria-label="Previous photo"><i data-lucide="chevron-left"></i></button>
+            <button class="lb-btn hp-next" id="hpNext" aria-label="Next photo"><i data-lucide="chevron-right"></i></button>
+            <div class="hp-caption"><span id="hpCap"></span><button class="chip" id="hpFull"><i data-lucide="maximize-2"></i>Full screen</button></div>
+          </div>` : ''}
           <div class="l-hero-controls">
             <button class="chip" id="orbitBtn"><i data-lucide="pause"></i>Pause</button>
             <button class="chip" id="dimBtn"><i data-lucide="square"></i>2D</button>
@@ -404,6 +495,7 @@
             ${factsHtml()}
             <section class="panel"><h2 class="display">About this ${A.typeName(l.type).toLowerCase()}</h2><p style="margin:6px 0 0;color:var(--ink-2);font-size:15.5px;line-height:1.65">${A.esc(l.blurb || '')}</p>
               ${l.ne && S.lang !== 'ne' ? `<p class="muted" style="margin:10px 0 0" lang="ne">${l.ne}</p>` : ''}</section>
+            ${photosPanel()}
             ${homeHtml()}
             ${viewPanel()}
             ${priceBand()}
@@ -438,6 +530,18 @@
         computeView(+b.dataset.eye);
       }));
 
+      el.querySelectorAll('[data-ph]').forEach(b => b.addEventListener('click', () => A.lightbox(photos, +b.dataset.ph, photoCtx())));
+      if (photos.length) {
+        el.querySelectorAll('#heroMode button').forEach(b => b.addEventListener('click', () => setHeroMode(b.dataset.mode)));
+        el.querySelector('#hpPrev').addEventListener('click', () => showHeroPhoto(heroIdx - 1));
+        el.querySelector('#hpNext').addEventListener('click', () => showHeroPhoto(heroIdx + 1));
+        el.querySelector('#hpFull').addEventListener('click', () => A.lightbox(photos, heroIdx, photoCtx()));
+        el.querySelector('#heroImg').addEventListener('click', () => A.lightbox(photos, heroIdx, photoCtx()));
+        el.querySelectorAll('#hpPrev, #hpNext').forEach(b => (b.hidden = photos.length < 2));
+        /* Homes lead with photos; land leads with the 3D plot. */
+        if (hasOwnPhotos() && ['house', 'flat', 'room'].includes(l.type)) setHeroMode('photos');
+      }
+
       startHero();
       loadTerrain();
       const vp = el.querySelector('#viewPanel');
@@ -457,6 +561,8 @@
     unmount() {
       io && io.disconnect();
       orbit && orbit.destroy();
+      photoPins.forEach(m => m.remove());
+      photoPins = [];
       map && map.remove();
       map = orbit = io = null;
       cleanup.forEach(fn => fn());

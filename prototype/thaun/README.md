@@ -27,6 +27,7 @@ Add `?tier=low` to the URL to see the low-power experience. It drops 3D terrain 
 | **Farm roots**: honest 3-year farm planner (base, expected and stretch cases) and lease models; water-verification flags | `#/p/sundarijal-rim`, `#/p/khokana-field`, `#/farms` |
 | **Seller flow**: search a ward or landmark → drop a pin → trace corners on satellite, with live R-A-P-D area, edge lengths in feet and a lalpurja comparison → price check → photos → private documents → 3D preview → publish | `#/sell/1` |
 | **From abroad**: eligibility for Nepali citizens, NRN card holders and foreign nationals (checked against current law on 2026-10-21), step-by-step remote buying, currency switch | `#/abroad` |
+| **Photos**: cover photo on every card with a satellite inset of the plot; hero toggle between 3D plot and photos; photo grid; full-screen viewer (arrows, swipe, Esc); seller photos with GPS show as pins on the map and are checked against the plot | `#/p/sundarijal-rim`, or upload your own in `#/sell/4` |
 | Shortlist (heart) → "Share with family" link; first-contact scam guard; EN / ने switch; light and dark themes | header |
 
 ## What's real and what's sample data
@@ -48,7 +49,12 @@ Add `?tier=low` to the URL to see the low-power experience. It drops 3D terrain 
 - Exchange rates.
 - Price trend lines.
 
-**Prototype only:** anything a seller enters is kept in this browser's localStorage, and uploaded photos and documents never leave the page.
+**Photos:**
+- Sample listings show **area photos** from Wikimedia Commons (CC BY / CC BY-SA, credited in the viewer). They show the neighbourhood, not the plot, and are labelled "Area photo". House and flat interiors have no photos, so those listings show a "no photos yet" state.
+- **Seller uploads** are resized in the browser (1600 px JPEG plus a 520 px thumbnail) and kept in this browser's IndexedDB, so they survive a reload. The GPS position in each photo's EXIF data, if there is one, is compared with the traced boundary: on the plot, beside it (within 60 m), or how far away.
+- iPhones often strip location when a photo is picked in the browser, so many uploads will show "No location". In the product, the Thaun app's own camera would capture location directly.
+
+**Prototype only:** anything a seller enters stays in this browser (localStorage for details, IndexedDB for photos). Documents and photos never leave the page.
 
 ## Stack (prototype only)
 
@@ -66,6 +72,8 @@ The production plan (`PORTAL_PLAN.md` §6) moves this to Next.js 16 / React 19 w
 | `index.html` | Shell, header, script order |
 | `styles.css` | Design tokens (light and dark), components |
 | `data.js` | Areas, places, peaks, sample listings, farm figures |
+| `data-photos.js` | Area photos for the sample listings (Wikimedia Commons, with credit and licence) |
+| `photos.js` | Seller photos: compression, EXIF GPS reading, IndexedDB storage, where-was-it-taken check |
 | `geo.js` | Land units, money formatting, parcel shapes, elevation sampling, line of sight, aerial thumbnails |
 | `map.js` | MapLibre setup, device tiers, camera flights, outline drawing, orbit, price pins |
 | `app.js` | State, EN/NE strings, router, cards, badges, scam guard, shortlist |

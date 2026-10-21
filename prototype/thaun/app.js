@@ -203,9 +203,23 @@
   };
 
   /* ---------- Card ---------- */
+  /* Card media: the cover photo with a small satellite inset of the plot, or the satellite view alone. */
+  A.cardMedia = (l, { row = false, w = 440, h = 275 } = {}) => {
+    const photos = TH.photos.forListing(l);
+    const aerial = row ? G.aerial(l.center, l.parcel, 460, 270, { fitW: 95, fitH: 95 }) : G.aerial(l.center, l.parcel, w, h);
+    if (!photos.length) return `<div class="lcard-media">${aerial}</div>`;
+    const cover = photos[0];
+    const area = photos.every(p => p.kind === 'area');
+    return `<div class="lcard-media">
+        <img class="lcard-photo" src="${cover.thumb}" alt="${A.esc(cover.caption || l.title)}" loading="lazy" decoding="async">
+        ${row ? '' : `<div class="lcard-inset" aria-hidden="true">${G.aerial(l.center, l.parcel, 220, 160, { fitW: 62, fitH: 46 })}</div>`}
+        <span class="lcard-count"><i data-lucide="camera"></i>${photos.length}${area ? ' · area' : ''}</span>
+      </div>`;
+  };
+
   A.card = (l, { row = false, w = 440, h = 275 } = {}) => `
     <article class="lcard ${row ? 'lcard-row' : ''}" data-id="${l.id}" tabindex="0" aria-label="${A.esc(l.title)}">
-      ${row ? G.aerial(l.center, l.parcel, 460, 270, { fitW: 95, fitH: 95 }) : G.aerial(l.center, l.parcel, w, h)}
+      ${A.cardMedia(l, { row, w, h })}
       <div class="lcard-badges">${row ? A.levelBadge(l) : A.badges(l)}</div>
       <button class="icon-btn lcard-save ${S.saved.has(l.id) ? 'is-on' : ''}" data-save="${l.id}" aria-label="Save" aria-pressed="${S.saved.has(l.id)}"><i data-lucide="heart"></i></button>
       <div class="lcard-body">
@@ -269,6 +283,87 @@
       visit: `Prototype: you would pick a site-visit slot with ${who}.`,
     };
     A.toast(msgs[channel] || msgs.whatsapp, channel === 'video' ? 'video' : 'message-circle');
+  };
+
+  /* ---------- Photo viewer ---------- */
+  /* Full-screen viewer with keyboard, swipe and thumbnails. ctx: { parcel, center, onShowOnMap } */
+  A.lightbox = (photos, start = 0, ctx = {}) => {
+    if (!photos.length) return;
+    let i = start;
+    const prevFocus = document.activeElement;
+    const el = document.createElement('div');
+    el.className = 'lb';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', 'Photos');
+    el.innerHTML = `
+      <div class="lb-top"><span class="lb-count num" aria-live="polite"></span><button class="lb-btn" data-lb="close" aria-label="Close"><i data-lucide="x"></i></button></div>
+      <div class="lb-stage"><img class="lb-img" alt=""><button class="lb-btn lb-prev" data-lb="prev" aria-label="Previous photo"><i data-lucide="chevron-left"></i></button><button class="lb-btn lb-next" data-lb="next" aria-label="Next photo"><i data-lucide="chevron-right"></i></button></div>
+      <div class="lb-info"><div class="lb-caption"></div><div class="lb-meta"></div></div>
+      <div class="lb-strip">${photos.map((p, k) => `<button data-k="${k}" aria-label="Photo ${k + 1}"><img src="${p.thumb}" alt="" loading="lazy"></button>`).join('')}</div>`;
+    document.body.appendChild(el);
+    document.body.style.overflow = 'hidden';
+    const img = el.querySelector('.lb-img');
+    const show = k => {
+      i = (k + photos.length) % photos.length;
+      const p = photos[i];
+      img.src = p.src;
+      img.alt = p.caption || 'Listing photo';
+      el.querySelector('.lb-count').textContent = `${i + 1} / ${photos.length}`;
+      el.querySelector('.lb-caption').textContent = p.caption || (p.kind === 'owner' ? 'Photo from the owner' : '');
+      let meta = '';
+      if (p.kind === 'area') meta = `<span class="badge badge-glass">Area photo, not the plot</span><a href="${p.link}" target="_blank" rel="noopener">${A.esc(p.credit)} · ${A.esc(p.license)} <i data-lucide="external-link"></i></a>`;
+      else {
+        const pl = TH.photos.placement(p, ctx.parcel, ctx.center);
+        meta = `<span class="badge ${pl.state === 'on' || pl.state === 'near' ? 'badge-owner' : pl.state === 'far' ? 'badge-warn' : 'badge-glass'}"><i data-lucide="${pl.state === 'none' ? 'map-pin-off' : 'map-pin'}"></i>${pl.label}</span>${p.takenAt ? `<span>Taken ${A.esc(p.takenAt.slice(0, 10))}</span>` : ''}`;
+        if (p.gps && ctx.onShowOnMap) meta += `<button class="btn btn-sm" data-lb="map"><i data-lucide="map-pin"></i>Show on the map</button>`;
+      }
+      el.querySelector('.lb-meta').innerHTML = meta;
+      el.querySelectorAll('.lb-strip button').forEach((b, k) => b.classList.toggle('is-on', k === i));
+      const on = el.querySelector('.lb-strip .is-on');
+      on && on.scrollIntoView({ block: 'nearest', inline: 'center', behavior: M.reducedMotion() ? 'auto' : 'smooth' });
+      el.querySelectorAll('.lb-prev, .lb-next').forEach(b => (b.hidden = photos.length < 2));
+      A.icons();
+    };
+    const close = () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+      el.remove();
+      prevFocus && prevFocus.focus && prevFocus.focus();
+    };
+    const onKey = e => {
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') show(i + 1);
+      else if (e.key === 'ArrowLeft') show(i - 1);
+      else if (e.key === 'Tab') {
+        const f = [...el.querySelectorAll('button, a')].filter(x => !x.hidden);
+        if (!f.length) return;
+        if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    el.addEventListener('click', e => {
+      const b = e.target.closest('[data-lb], [data-k]');
+      if (!b) { if (e.target === el || e.target.classList.contains('lb-stage')) close(); return; }
+      if (b.dataset.k != null) return show(+b.dataset.k);
+      const a = b.dataset.lb;
+      if (a === 'close') close();
+      if (a === 'prev') show(i - 1);
+      if (a === 'next') show(i + 1);
+      if (a === 'map') { const p = photos[i]; close(); ctx.onShowOnMap(p, i); }
+    });
+    let x0 = null;
+    const stage = el.querySelector('.lb-stage');
+    stage.addEventListener('pointerdown', e => (x0 = e.clientX));
+    stage.addEventListener('pointerup', e => {
+      if (x0 == null) return;
+      const dx = e.clientX - x0;
+      x0 = null;
+      if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1));
+    });
+    show(i);
+    el.querySelector('[data-lb="close"]').focus();
   };
 
   /* ---------- Saved shortlist ---------- */
@@ -377,7 +472,8 @@
     A.icons();
   }
 
-  function init() {
+  async function init() {
+    await TH.photos.init();
     const cur = document.getElementById('currency');
     cur.innerHTML = Object.keys(TH.FX).map(k => `<option value="${k}">${k}</option>`).join('');
     cur.value = S.currency;
@@ -401,7 +497,7 @@
       const card = e.target.closest('.lcard[data-id]');
       if (card && !e.target.closest('[data-noopen]')) {
         drawer.classList.remove('is-open');
-        A.go(`#/p/${card.dataset.id}`, { morphFrom: card.querySelector('.aerial') });
+        A.go(`#/p/${card.dataset.id}`, { morphFrom: card.querySelector('.lcard-media') });
       }
     });
     document.addEventListener('keydown', e => {
