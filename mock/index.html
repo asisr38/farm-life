@@ -453,11 +453,11 @@ function yieldChart(ys){
    FARMER: PLANNER
    ===================================================================== */
 function screenCalc(){
-  return `${pageHead('Honest planner','Field-validated economics, base case not best case. Land is capped at the 2025 legal ceiling of 10 ropani.')}
+  return `${pageHead('Honest planner','Field-validated economics, base case not best case. Land is capped at the Kathmandu Valley ceiling of 25 ropani per family.')}
     <div class="grid lg:grid-cols-2 gap-5">
       ${panel(`<div class="space-y-6">
         <div><div class="flex justify-between text-sm font-medium mb-1.5"><span>Land size</span><span id="c-land-l" class="num text-accent-700">5 ropani</span></div>
-          <input id="c-land" type="range" min="1" max="10" value="5" class="w-full"><div class="flex justify-between text-[10px] text-stone-400 mt-1"><span class="num">1</span><span>legal ceiling 10 ropani</span></div></div>
+          <input id="c-land" type="range" min="1" max="25" value="5" class="w-full"><div class="flex justify-between text-[10px] text-stone-400 mt-1"><span class="num">1</span><span>legal ceiling 25 ropani</span></div></div>
         <div><div class="text-sm font-medium mb-2">Scenario</div><div class="grid grid-cols-3 gap-2" id="c-scn">
           <button data-scn="base" class="scn press rounded-lg border-2 border-accent-600 bg-accent-50 p-2.5 text-center"><div class="text-sm font-semibold">Base</div><div class="num text-[10px] text-stone-500">~100k/rop</div></button>
           <button data-scn="exp" class="scn press rounded-lg border border-stone-200 p-2.5 text-center"><div class="text-sm font-semibold">Expected</div><div class="num text-[10px] text-stone-500">~140k/rop</div></button>

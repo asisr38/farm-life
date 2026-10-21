@@ -39,10 +39,10 @@ These are very different businesses with very different risk profiles. Most of t
 | Lease ≈ **NPR 1.1–1.3 lakh / ropani / yr** | Documented Kathmandu Valley leasehold rate ≈ **NPR 15,000 / ropani / yr** (rising ~10%/yr) in a 2024 study. Peri-urban premium land is higher, but the plan's figure is ~**7–8× the documented average.** | ⚠️ Likely overstated (or cherry-picked from prime Ring-Road land) — verify per actual short-listed plots. |
 | **0.25 ha (5 ropani) grosses 14–16 lakh/yr** from year 2, **30–35% net margin** | Field studies: organic veg **gross ≈ NPR 101,536 / ropani / yr** (conventional ≈ 135,747). 5 ropani ⇒ **~NPR 5–7 lakh gross**, not 14–16. The plan implies ~280–320k/ropani — top-decile, multi-cropping, polytunnel, secured-premium-market territory, **not a base case.** | ❌ Revenue inflated ~2.5–3×. Margins: most small farms run **<10% operating margin** and are classified "high financial risk." |
 | Organic price premium **20–50%** | Consumer willingness-to-pay studies: **~6–20% typical, ~30% average, up to 50%** at the top. **Only ~40% of organic output actually gets traded** as organic (weak market positioning). | ✅ Premium real but optimistic end; **demand absorption, not premium, is the constraint.** |
-| Individuals capped at **25 ropani** in the Valley | Historically 25 ropani — but a **2025 amendment reduced the Kathmandu Valley ceiling to ~10 ropani** (with carve-outs for housing/industry). | ⚠️ Outdated. The Financial Calculator's 25-ropani slider is now legally wrong. |
+| Individuals capped at **25 ropani** in the Valley | ~~2025 amendment reduced the Valley ceiling to ~10 ropani~~ **Corrected 2026-10-21: still 25 ropani** (Lands Act s.7, unchanged since 2001; the Jan 2025 ordinance and bill only concerned developer exemptions and lapsed). | ✅ Correct. The 25-ropani slider is fine. |
 | "Foreigners cannot own land (lease-only)" | **Correct.** Foreign *companies* may lease up to **50 years** for approved commercial activity. | ✅ Accurate — and the one legal fact the plan gets exactly right. |
 | Water risk = a seasonal Mar–May footnote | Valley groundwater extraction is **~6× recharge**, water table dropping **~2.5 m/yr**; only **~19% of agriculture has year-round irrigation**; dry-season supply ≈ 90 ML/day vs ≥360 ML/day demand. | ❌ Under-weighted. Water is an **existential, structural** risk, not a seasonal line item. |
-| Platform Yr-3 revenue **$300k–500k**, avg lease value **$3k–8k**, **10–15% commission**, CAC **$500–1k** | These are **U.S.-marketplace economics** applied to a market whose *only legal participants* (local farmers) lease at ~NPR 15k/ropani (~$110/ropani). A $3–8k lease ≈ 27–73 ropani — above the new legal ceiling. | ❌ Top-line and unit economics built on the wrong market. |
+| Platform Yr-3 revenue **$300k–500k**, avg lease value **$3k–8k**, **10–15% commission**, CAC **$500–1k** | These are **U.S.-marketplace economics** applied to a market whose *only legal participants* (local farmers) lease at ~NPR 15k/ropani (~$110/ropani). A $3–8k lease ≈ 27–73 ropani — near or above the 25-ropani Valley ceiling. | ❌ Top-line and unit economics built on the wrong market. |
 | "Respectable return within **3 years**" / lifestyle relief | Beginning farmers typically work **80–100 hrs/week at ~$2/hr for 3–7 years**; most don't clear year 3. Agriculture's *business* survival is actually decent (~66% at 5 yrs), but *profitability* is brutal early. | ⚠️ The "escape burnout into a profitable, restful farm in 3 years" promise is the opposite of the lived reality. |
 
 *Sources for every row are listed in §9.*
@@ -153,7 +153,7 @@ Thinking past the screen, into dirt, water, money, and law:
 
 ### P0 — Truth & legality (do before pitching anyone)
 1. **Rewrite the financials** against documented data: ~NPR 5–7 lakh gross on 5 ropani as the *base* case; show the 14–16 lakh figure only as an explicit top-decile scenario with the assumptions (polytunnels, multi-cropping, secured premium offtake) stated. Re-do the platform revenue model on *local* lease values, not U.S. ones.
-2. **Get a Nepali corporate/land lawyer's written opinion** on the foreign-participant path (FITTA 75%-export rule, FDI minimum, work visa, the new ~10-ropani ceiling). Until then, **stop marketing to U.S. developers as primary** — it may be unsellable and reputationally risky.
+2. **Get a Nepali corporate/land lawyer's written opinion** on the foreign-participant path (FITTA 75%-export rule, FDI minimum, work visa, the land ceiling, 25 ropani in the Valley per the 2026-10-21 check). Until then, **stop marketing to U.S. developers as primary** — it may be unsellable and reputationally risky.
 3. **Re-pick the launch persona** to the legally-able one (local/NRN), and rebuild the homepage narrative around it.
 
 ### P1 — Make the business buildable
@@ -184,7 +184,7 @@ Thinking past the screen, into dirt, water, money, and law:
 
 **Land ceiling**
 - [Eighth amendment to Land Act imposes new land ceiling (The Himalayan Times)](https://thehimalayantimes.com/kathmandu/eighth-amendment-to-land-act-imposes-new-land-ceiling)
-- [Nepal eases land ceiling laws — KV reduced to 10 ropani (Fiscal Nepal)](https://www.fiscalnepal.com/2025/01/16/19208/nepal-eases-land-ceiling-laws-offering-relief-to-real-estate-developers/)
+- ~~[Nepal eases land ceiling laws — KV reduced to 10 ropani (Fiscal Nepal)](https://www.fiscalnepal.com/2025/01/16/19208/nepal-eases-land-ceiling-laws-offering-relief-to-real-estate-developers/)~~ (not supported by primary sources; see `PORTAL_MARKET_RESEARCH.md` §5)
 
 **Lease rates & farm economics**
 - [Agricultural Land Rental Arrangements in Nepal — ~NPR 15k/ropani/yr (Giri & Goswami, 2024, SAGE)](https://journals.sagepub.com/doi/10.1177/10185291241296212)

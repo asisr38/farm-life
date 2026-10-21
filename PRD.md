@@ -10,6 +10,8 @@
 | **Companion docs** | `PLAN_REVIEW.md` (strategic + technical critique, with sourced data), `kathmandu_valley_farm_plan.md` (operating domain knowledge) |
 | **Key decisions baked in** | (1) **Primary market: local Nepali + returning-NRN farmers**, not foreign operators. (2) **Farm operating knowledge is delivered as in-product features**, not a separate doc. (3) **MVP money event = concierge (admin-facilitated, admin-recorded) lease; payments logged off-platform.** |
 
+> **Superseded phasing (2026-10-21).** The product is widening into a general, map-first property portal for Nepal (land for sale and lease, homes for sale and rent). See `PORTAL_PLAN.md`. Map-first discovery moves from Phase 3 to Phase 1. The farmland lease lifecycle in this PRD (§7, the epics, the trust mechanics) carries over unchanged as the **Lease → Farmland vertical** inside the portal. The portal's name is **Thaun** (ठाउँ, "place"); see `PORTAL_PLAN.md` §11.
+
 ---
 
 ## 1. Summary
@@ -18,7 +20,7 @@ Kathmandu Valley Farm connects **landowners with idle peri-urban farmland** to *
 
 In the MVP, the marketplace is **concierge-operated**: a platform operator (admin) does the matching, vetting, and lease facilitation by hand, and the software's job is to **structure, record, and make trustworthy** what is otherwise an informal, litigation-prone handshake. We earn a **facilitation fee** on each lease and, later, sell standardized legal templates, compliance concierge, and produce-offtake linkage.
 
-This is deliberately **not** the original "U.S. software developer leases land and farms for profit" pitch — `PLAN_REVIEW.md` documents why that persona is largely **not legally executable** today (FITTA 75%-export rule for primary-agriculture FDI, ~NPR 20M minimum foreign investment, no live remote-work visa, ~10-ropani Valley land ceiling). Foreign/diaspora participation returns later as a **regulated agritourism / joint-venture segment**, not as the launch wedge.
+This is deliberately **not** the original "U.S. software developer leases land and farms for profit" pitch — `PLAN_REVIEW.md` documents why that persona is largely **not legally executable** today (FITTA 75%-export rule for primary-agriculture FDI, ~NPR 20M minimum foreign investment, no live remote-work visa, foreigners barred from owning land under Civil Code s.432). Foreign/diaspora participation returns later as a **regulated agritourism / joint-venture segment**, not as the launch wedge.
 
 ---
 
@@ -72,7 +74,7 @@ This is deliberately **not** the original "U.S. software developer leases land a
 
 - **Lease rates:** documented ~NPR 15k/ropani/yr (rising ~10%/yr); prime peri-urban higher. Use per-plot real figures, not the old 1.1–1.3 lakh assumption.
 - **Farm economics:** organic gross ~NPR 101.5k/ropani/yr (conventional ~135.7k). A 5-ropani plot ⇒ **~NPR 5–7 lakh gross base case** (not 14–16 lakh). Most small farms run <10% operating margin → market linkage is decisive.
-- **Land ceiling:** Valley individual ceiling reduced to **~10 ropani** (2025) — calculator/limits must reflect this.
+- **Land ceiling (corrected 2026-10-21):** Lands Act 2021 s.7 is unchanged since 2001. **25 ropani in the Kathmandu Valley, 70 ropani elsewhere in the hills, 10 bigha in the Terai, per person *including their family*** (+5 ropani / +1 bigha for a homestead). The earlier "~10 ropani (2025)" claim was wrong; the 2025 ordinance and bill lapsed, and the Oct 2026 ordinance doesn't touch s.7. Sources are in `PORTAL_MARKET_RESEARCH.md` §5.
 - **Water:** aquifer extraction ~6× recharge, table dropping ~2.5 m/yr, only ~19% of agriculture year-round irrigated. **Dry-season water is the binding constraint.**
 - **Legal:** foreigners cannot own land; foreign primary-agriculture FDI needs ≥75% export + ~NPR 20M min → foreign profit-farming is out of scope for v1.
 
@@ -154,7 +156,7 @@ Listing(Draft) → Listing(Published) → Inquiry → Application
 - **F3 [MVP]** As a farmer, I want a **role-correct dashboard** (plots leased, crops, yield trend, income), and as a **landowner** a dashboard of owned plots, active leases, and rent received. *(Fixes current farmer-only dashboard.)*
 
 ### EPIC G — Farm Operating Playbook (baked-in knowledge) (Phase 1)
-- **G1 [MVP]** As a farmer, I want a **realistic financial calculator** (base/expected/stretch scenarios with field-validated defaults; land-size capped at the legal ~10-ropani ceiling), so that I plan honestly. *(Fixes inflated revenue + 25-ropani slider.)*
+- **G1 [MVP]** As a farmer, I want a **realistic financial calculator** (base/expected/stretch scenarios with field-validated defaults; land-size capped at the Valley ceiling of 25 ropani per family), so that I plan honestly. *(Fixes inflated revenue.)*
 - **G2 [MVP]** As a farmer, I want a **guided "My Journey"** (the 6-phase roadmap) tied to my real lease/plot state, so that I know my next concrete step.
 - **G3 [MVP]** As a user, I want a **resource directory** (markets, certification e.g. PGS, suppliers, KVFN, provincial mediation), so that I can act offline.
 - **G4** As a farmer, I want **water and market-access checklists** as part of plot evaluation, so that I avoid the two biggest failure modes. *(Ties into B1/B4.)*

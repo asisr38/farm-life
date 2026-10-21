@@ -21,7 +21,7 @@ Open `index.html` in any browser (double-click, or `open mock/index.html` on mac
 | Ledger (append-only, off-platform payments logged) | **E** — Payments & ledger |
 | Farmer dashboard (crops, yields chart) | **F** — Operating dashboard |
 | Browse Land + Express interest | **B/C** — discovery + inquiry |
-| Honest Planner (base/expected/stretch, 10-ropani cap) | **G1** — realistic calculator |
+| Honest Planner (base/expected/stretch, 25-ropani Valley cap) | **G1** — realistic calculator |
 | My Journey (6 phases tied to state) | **G2** |
 | Resources | **G3** |
 | Role switcher (operator/farmer/landowner) | **A/F3** — roles & role-aware views |
