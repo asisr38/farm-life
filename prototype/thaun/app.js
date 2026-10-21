@@ -30,7 +30,7 @@
   /* ---------- i18n (chrome and key copy; listing content stays bilingual where provided) ---------- */
   const DICT = {
     en: {
-      'nav.explore': 'Explore', 'nav.sell': 'List your land', 'nav.abroad': 'From abroad', 'nav.farms': 'Farms',
+      'nav.explore': 'Explore', 'nav.sell': 'List your land', 'nav.my': 'Your listings', 'nav.abroad': 'From abroad', 'nav.farms': 'Farms',
       'hero.title': 'Find your <em>thaun</em>.',
       'hero.sub': 'Land, homes and farmland across Nepal. Every listing sits on its real plot, in 3D, with a price you can check and a badge that means something.',
       'intent.all': 'All', 'intent.buy': 'Buy', 'intent.rent': 'Rent', 'intent.lease': 'Lease',
@@ -41,7 +41,7 @@
       'theme': 'Theme', 'lang.switch': 'ने',
     },
     ne: {
-      'nav.explore': 'खोज्नुहोस्', 'nav.sell': 'जग्गा राख्नुहोस्', 'nav.abroad': 'विदेशबाट', 'nav.farms': 'खेतीबारी',
+      'nav.explore': 'खोज्नुहोस्', 'nav.sell': 'जग्गा राख्नुहोस्', 'nav.my': 'तपाईंका सूची', 'nav.abroad': 'विदेशबाट', 'nav.farms': 'खेतीबारी',
       'hero.title': 'आफ्नो <em>ठाउँ</em> खोज्नुहोस्।',
       'hero.sub': 'नेपालभरिका जग्गा, घर र खेतीयोग्य जमिन। हरेक सूची आफ्नै वास्तविक कित्तामा, थ्रीडीमा, जाँच्न मिल्ने मूल्य र अर्थपूर्ण प्रमाणीकरणसहित।',
       'intent.all': 'सबै', 'intent.buy': 'किन्ने', 'intent.rent': 'भाडा', 'intent.lease': 'लिज',
@@ -67,14 +67,31 @@
     if (parcel) { parcel.id = l.id; parcel.properties = { id: l.id }; }
     return Object.assign(l, { _prepped: true, area, m2, parcel });
   }
+  const daysSince = iso => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 864e5));
+  A.daysSince = daysSince;
+  /* A seller's own listing keeps real dates; ages and badges are worked out from them on every read. */
+  function live(l) {
+    if (!l.mine || l.draft) return l;
+    if (l.publishedAt) l.posted = daysSince(l.publishedAt);
+    const checks = Object.entries(l.checks || {}).map(([k, iso]) => [k, daysSince(iso)]);
+    if (l.reconfirmedAt) checks.push(['reconfirmed', daysSince(l.reconfirmedAt)]);
+    l.verified = checks;
+    return l;
+  }
+  A.isLive = l => !l.status || l.status === 'active';
+  /* Only source fields are stored; derived ones (area, parcel) are rebuilt on load. */
+  A.savePublished = () => {
+    store.set('published', S.published.map(({ _prepped, area, parcel, verified, posted, ...rest }) => rest));
+  };
   function nearestArea(c) {
     let best = TH.AREAS[0], bd = Infinity;
     for (const a of TH.AREAS) { const d = turf.distance(c, a.center); if (d < bd) { bd = d; best = a; } }
     return best;
   }
   A.nearestArea = nearestArea;
-  TH.all = () => [...TH.LISTINGS, ...S.published].map(prep);
-  TH.byId = id => (id === 'draft' ? A.draftListing() : TH.all().find(l => l.id === id));
+  TH.everything = () => [...TH.LISTINGS, ...S.published].map(prep).map(live);
+  TH.all = () => TH.everything().filter(A.isLive);
+  TH.byId = id => (id === 'draft' ? A.draftListing() : TH.everything().find(l => l.id === id));
 
   A.draftListing = () => {
     const d = S.draft;
@@ -410,6 +427,7 @@
     [/^#\/sell(?:\/(\d))?/, 'sell'],
     [/^#\/abroad/, 'abroad'],
     [/^#\/farms/, 'farms'],
+    [/^#\/my/, 'my'],
     [/^#?\/?$/, 'home'],
   ];
   let current = null, currentName = null;
@@ -452,6 +470,7 @@
   };
 
   /* ---------- Header ---------- */
+  A.header = () => header();
   function header() {
     const h = document.getElementById('topbar');
     h.querySelector('[data-nav="explore"]').textContent = t('nav.explore');
@@ -459,8 +478,11 @@
     h.querySelector('[data-nav="abroad"]').textContent = t('nav.abroad');
     h.querySelector('[data-nav="farms"]').textContent = t('nav.farms');
     document.getElementById('langBtn').textContent = t('lang.switch');
-    document.getElementById('mobileNav').innerHTML = ['explore', 'sell', 'abroad', 'farms']
-      .map(k => `<a href="#/${k}" data-nav="${k}">${t('nav.' + k)}</a>`).join('');
+    const mine = S.published.length > 0;
+    h.querySelector('[data-nav="my"]').hidden = !mine;
+    h.querySelector('[data-nav="my"]').textContent = t('nav.my');
+    document.getElementById('mobileNav').innerHTML = ['explore', 'sell', ...(mine ? ['my'] : []), 'abroad', 'farms']
+      .map(k => `<a href="#/${k === 'sell' ? 'sell/1' : k}" data-nav="${k}">${t('nav.' + k)}</a>`).join('');
     document.documentElement.lang = S.lang === 'ne' ? 'ne' : 'en';
   }
   function applyTheme() {

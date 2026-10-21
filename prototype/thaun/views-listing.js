@@ -240,12 +240,13 @@
     return `
       <section class="panel contact">
         <div class="who"><span class="avatar">${initials}</span><div><b>${A.esc(name)}</b><span>${A.sourceText(l)}${l.licence ? ` · ${l.licence}` : ''}</span></div></div>
+        ${!A.isLive(l) ? `<div class="private"><i data-lucide="handshake"></i><span>This listing is closed, so contact is switched off. <a class="link" href="#/explore?area=${l.areaId}">See similar places nearby</a></span></div>` : `
         <button class="btn btn-primary btn-block" data-contact="whatsapp"><i data-lucide="message-circle"></i>Message on WhatsApp</button>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <button class="btn btn-sm" data-contact="viber"><i data-lucide="phone"></i>Viber</button>
           <button class="btn btn-sm" data-contact="visit"><i data-lucide="calendar"></i>Site visit</button>
         </div>
-        ${l.remote ? `<button class="btn btn-brand btn-block" data-contact="video"><i data-lucide="video"></i>Book a live video walk</button>` : ''}
+        ${l.remote ? `<button class="btn btn-brand btn-block" data-contact="video"><i data-lucide="video"></i>Book a live video walk</button>` : ''}`}
         <div class="private"><i data-lucide="shield"></i><span>Thaun never asks buyers or renters for form fees. Pay nothing before a site visit.</span></div>
       </section>`;
   }
@@ -456,6 +457,8 @@
       photos = TH.photos.forListing(l);
       heroIdx = 0;
       el.innerHTML = `
+        ${!A.isLive(l) ? `<div class="closed-banner"><i data-lucide="handshake"></i>This ${A.typeName(l.type).toLowerCase()} was marked ${A.esc(l.status)} on ${new Date(l.statusAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}. It's no longer available.${l.mine ? ' <a class="btn btn-sm" href="#/my">Manage</a>' : ''}</div>` : ''}
+        ${l.mine && !l.draft && A.isLive(l) ? `<div class="closed-banner is-mine"><i data-lucide="user"></i>This is your listing. <a class="btn btn-sm" href="#/my">Manage it</a></div>` : ''}
         ${l.draft ? `<div style="background:var(--ink);color:var(--bg);padding:10px 20px;font-weight:600;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap"><i data-lucide="eye"></i>Preview: this is how buyers will see your listing <a class="btn btn-sm btn-primary" href="#/sell/6">Back to publishing</a></div>` : ''}
         <section class="l-hero" style="view-transition-name:hero">
           <div class="map" id="lmap"></div>
@@ -508,7 +511,7 @@
             ${eligHtml()}
           </aside>
         </div>
-        <div class="mobile-cta"><button class="btn" data-save="${l.id}"><i data-lucide="heart"></i>${A.t('save')}</button><button class="btn btn-primary" data-contact="whatsapp"><i data-lucide="message-circle"></i>${A.t('contact')}</button></div>`;
+        ${A.isLive(l) ? `<div class="mobile-cta"><button class="btn" data-save="${l.id}"><i data-lucide="heart"></i>${A.t('save')}</button><button class="btn btn-primary" data-contact="whatsapp"><i data-lucide="message-circle"></i>${A.t('contact')}</button></div>` : ''}`;
 
       priceHead();
       wireHeroControls();

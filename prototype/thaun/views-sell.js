@@ -228,7 +228,7 @@
         const l = A.draftListing();
         return `
         <div class="eyebrow">Step 6 of ${STEPS} · Preview</div>
-        <h2 class="display">Ready to publish</h2>
+        <h2 class="display">${d.editing ? 'Ready to save' : 'Ready to publish'}</h2>
         <p>This is the card buyers will see on the map and in search.</p>
         ${l ? A.card(l) : ''}
         <div class="ledger">
@@ -256,7 +256,7 @@
     document.querySelectorAll('#stepper i').forEach((s, i) => { s.className = i + 1 < step ? 'is-done' : i + 1 === step ? 'is-on' : ''; });
     const next = document.getElementById('next');
     next.disabled = !canNext();
-    next.innerHTML = step === STEPS ? '<i data-lucide="rocket"></i>Publish' : 'Continue <i data-lucide="arrow-right"></i>';
+    next.innerHTML = step === STEPS ? (d.editing ? '<i data-lucide="check"></i>Save changes' : '<i data-lucide="rocket"></i>Publish') : 'Continue <i data-lucide="arrow-right"></i>';
     document.getElementById('back').style.visibility = step > 1 ? 'visible' : 'hidden';
     wireStep();
     A.icons();
@@ -430,14 +430,23 @@
   }
 
   async function publish() {
-    const id = `my-${Date.now().toString(36)}`;
+    const editing = d.editing && S.published.find(x => x.id === d.editing);
+    const id = editing ? editing.id : `my-${Date.now().toString(36)}`;
     await TH.photos.move('draft', id);
-    const listing = A.draftToListing(d, id);
-    listing.draft = false;
-    S.published = [...S.published, listing];
-    A.save('published');
+    const { editing: _e, ...form } = d;
+    const listing = Object.assign(A.draftToListing(d, id), {
+      draft: false, form,
+      publishedAt: editing ? editing.publishedAt : new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      status: editing ? editing.status || 'active' : 'active',
+      checks: editing ? editing.checks || {} : {},
+      reconfirmedAt: editing ? editing.reconfirmedAt : undefined,
+    });
+    S.published = editing ? S.published.map(x => (x.id === id ? listing : x)) : [...S.published, listing];
+    A.savePublished();
     S.draft = null; A.save('draft');
-    A.toast('Published. Thaun will verify it within two working days.', 'rocket');
+    A.header();
+    A.toast(editing ? 'Changes saved.' : 'Published. Thaun will verify it within two working days.', editing ? 'check' : 'rocket');
     location.hash = `#/p/${id}`;
   }
 
@@ -470,7 +479,7 @@
       el.querySelector('#back').addEventListener('click', () => go(step - 1));
       el.querySelector('#next').addEventListener('click', () => (step === STEPS ? publish() : go(step + 1)));
       el.querySelector('#reset').addEventListener('click', async () => {
-        const v = await A.modal(`<h2 class="display">Start over?</h2><p class="muted" style="margin:0">This clears your pin, boundary and details.</p><div class="modal-actions"><button class="btn" data-v="no">Keep editing</button><button class="btn btn-primary" data-v="yes">Start over</button></div>`);
+        const v = await A.modal(`<h2 class="display">${d.editing ? 'Stop editing?' : 'Start over?'}</h2><p class="muted" style="margin:0">${d.editing ? 'Your published listing stays as it was.' : 'This clears your pin, boundary and details.'}</p><div class="modal-actions"><button class="btn" data-v="no">Keep editing</button><button class="btn btn-primary" data-v="yes">Start over</button></div>`);
         if (v !== 'yes') return;
         d = blank(); persist(); TH.photos.clear('draft');
         pinMarker && pinMarker.remove(); pinMarker = null;

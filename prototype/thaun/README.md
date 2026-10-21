@@ -28,6 +28,7 @@ Add `?tier=low` to the URL to see the low-power experience. It drops 3D terrain 
 | **Seller flow**: search a ward or landmark → drop a pin → trace corners on satellite, with live R-A-P-D area, edge lengths in feet and a lalpurja comparison → price check → photos → private documents → 3D preview → publish | `#/sell/1` |
 | **From abroad**: eligibility for Nepali citizens, NRN card holders and foreign nationals (checked against current law on 2026-10-21), step-by-step remote buying, currency switch | `#/abroad` |
 | **Photos**: cover photo on every card with a satellite inset of the plot; hero toggle between 3D plot and photos; photo grid; full-screen viewer (arrows, swipe, Esc); seller photos with GPS show as pins on the map and are checked against the plot | `#/p/sundarijal-rim`, or upload your own in `#/sell/4` |
+| **Your listings** (appears after you publish): verification progress, a listing-quality checklist with Fix links into the seller flow, "Still available" re-confirm to keep the badge fresh, edit, photos, mark sold/rented/leased, relist, delete | `#/my` |
 | Shortlist (heart) → "Share with family" link; first-contact scam guard; EN / ने switch; light and dark themes | header |
 
 ## What's real and what's sample data
@@ -77,7 +78,7 @@ The production plan (`PORTAL_PLAN.md` §6) moves this to Next.js 16 / React 19 w
 | `geo.js` | Land units, money formatting, parcel shapes, elevation sampling, line of sight, aerial thumbnails |
 | `map.js` | MapLibre setup, device tiers, camera flights, outline drawing, orbit, price pins |
 | `app.js` | State, EN/NE strings, router, cards, badges, scam guard, shortlist |
-| `views-*.js` | Home, explore, listing, sell, and the abroad and farms pages |
+| `views-*.js` | Home, explore, listing, sell, your listings (`views-my.js`), and the abroad and farms pages |
 
 ## Things this prototype taught us (feed into Phase 0)
 
